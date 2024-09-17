@@ -8,7 +8,17 @@ package chess;
  */
 public class ChessPosition {
 
+    private int row;
+    private int col;
+
     public ChessPosition(int row, int col) {
+        this.row = row;
+        this.col = col;
+    }
+
+    public ChessPosition(ChessPosition  obj) {
+        this.row = obj.getRow();
+        this.col = obj.getColumn();
     }
 
     /**
@@ -16,7 +26,7 @@ public class ChessPosition {
      * 1 codes for the bottom row
      */
     public int getRow() {
-        throw new RuntimeException("Not implemented");
+        return this.row;
     }
 
     /**
@@ -24,6 +34,23 @@ public class ChessPosition {
      * 1 codes for the left row
      */
     public int getColumn() {
-        throw new RuntimeException("Not implemented");
+        return this.col;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof ChessPosition)) return false;
+        ChessPosition other = (ChessPosition) obj;
+        return this.getRow() == other.getRow() && this.getColumn() == other.getColumn();
+    }
+
+    @Override
+    public int hashCode() {
+        int code = 0;
+        code += 10 * this.row;
+        code += this.col;
+        code *= 137;
+        return code;
     }
 }
