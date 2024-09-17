@@ -52,7 +52,15 @@ public class ChessMove {
 
     @Override
     public int hashCode() {
-        return super.hashCode();
+        int code = 0;
+        code += 10000 * this.getStartPosition().getColumn();
+        code += 1000 * this.getStartPosition().getRow();
+        code += 100 + this.getEndPosition().getColumn();
+        code += 10 * this.getEndPosition().getRow();
+        if (this.getPromotionPiece() != null) {
+            code += 1;
+        }
+        return code * 37;
     }
 
     @Override
