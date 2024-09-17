@@ -8,22 +8,31 @@ package chess;
  */
 public class ChessMove {
 
+    private ChessPosition startPosition;
+    private ChessPosition endPosition;
+    private ChessPiece.PieceType promotionPiece;
+
     public ChessMove(ChessPosition startPosition, ChessPosition endPosition,
                      ChessPiece.PieceType promotionPiece) {
+        this.startPosition = startPosition;
+        this.endPosition = endPosition;
+        this.promotionPiece = promotionPiece;
     }
 
     /**
      * @return ChessPosition of starting location
      */
     public ChessPosition getStartPosition() {
-        throw new RuntimeException("Not implemented");
+
+        return this.startPosition;
     }
 
     /**
      * @return ChessPosition of ending location
      */
     public ChessPosition getEndPosition() {
-        throw new RuntimeException("Not implemented");
+
+        return this.endPosition;
     }
 
     /**
@@ -33,6 +42,28 @@ public class ChessMove {
      * @return Type of piece to promote a pawn to, or null if no promotion
      */
     public ChessPiece.PieceType getPromotionPiece() {
-        throw new RuntimeException("Not implemented");
+
+        if (this.promotionPiece != null) {
+            return this.promotionPiece;
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof ChessMove other)) return false;
+        if (!this.getStartPosition().equals(other.getStartPosition())) return false;
+        if (!this.getEndPosition().equals(other.getEndPosition())) return false;
+        if (this.getPromotionPiece() == null) {
+            return other.getPromotionPiece() == null;
+        }
+        return this.getPromotionPiece().equals(other.getPromotionPiece());
     }
 }
