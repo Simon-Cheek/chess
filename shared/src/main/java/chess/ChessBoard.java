@@ -8,8 +8,10 @@ package chess;
  */
 public class ChessBoard {
 
+    private ChessPiece[][] board;
+
     public ChessBoard() {
-        
+        this.board = new ChessPiece[9][9];
     }
 
     /**
@@ -19,7 +21,7 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        throw new RuntimeException("Not implemented");
+        this.board[8 - position.getRow()][position.getColumn() - 1] = piece;
     }
 
     /**
@@ -30,7 +32,7 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        throw new RuntimeException("Not implemented");
+        return this.board[8 - position.getRow()][position.getColumn() - 1];
     }
 
     /**
@@ -38,6 +40,25 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        throw new RuntimeException("Not implemented");
+        this.board = new ChessPiece[8][8];
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        System.out.println("Testing to see if equal");
+        System.out.println(this.board);
+
+        if (obj == null) return false;
+        if (!(obj instanceof ChessBoard)) return false;
+        ChessBoard other = (ChessBoard) obj;
+
+        for (int i = 1; i < 9; i++) {
+            for (int ii = 1; i < 9; i++) {
+                ChessPosition current = new ChessPosition(i, ii);
+                if (!(this.getPiece(current) == other.getPiece(current))) return false;
+            }
+        }
+        return true;
     }
 }
