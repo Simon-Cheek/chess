@@ -12,6 +12,7 @@ public class ChessBoard {
 
     public ChessBoard() {
         this.board = new ChessPiece[8][8];
+        this.resetBoard();
     }
 
     /**
@@ -55,6 +56,7 @@ public class ChessBoard {
             for (int ii = 1; i < 9; i++) {
                 ChessPosition current = new ChessPosition(i, ii);
                 if (this.getPiece(current) == null) {
+                    System.out.println("null");
                     return other.getPiece(current) == null;
                 }
                 if (!(this.getPiece(current).equals(other.getPiece(current)))) return false;
