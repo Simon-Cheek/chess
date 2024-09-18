@@ -11,7 +11,7 @@ public class ChessBoard {
     private ChessPiece[][] board;
 
     public ChessBoard() {
-        this.board = new ChessPiece[9][9];
+        this.board = new ChessPiece[8][8];
     }
 
     /**
@@ -41,14 +41,12 @@ public class ChessBoard {
      */
     public void resetBoard() {
         this.board = new ChessPiece[8][8];
+        ChessInitBoard.addWhitePieces(this);
+        ChessInitBoard.addBlackPieces(this);
     }
 
     @Override
     public boolean equals(Object obj) {
-
-        System.out.println("Testing to see if equal");
-        System.out.println(this.board);
-
         if (obj == null) return false;
         if (!(obj instanceof ChessBoard)) return false;
         ChessBoard other = (ChessBoard) obj;
@@ -56,7 +54,10 @@ public class ChessBoard {
         for (int i = 1; i < 9; i++) {
             for (int ii = 1; i < 9; i++) {
                 ChessPosition current = new ChessPosition(i, ii);
-                if (!(this.getPiece(current) == other.getPiece(current))) return false;
+                if (this.getPiece(current) == null) {
+                    return other.getPiece(current) == null;
+                }
+                if (!(this.getPiece(current).equals(other.getPiece(current)))) return false;
             }
         }
         return true;

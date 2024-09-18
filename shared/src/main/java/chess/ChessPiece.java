@@ -60,6 +60,7 @@ public class ChessPiece {
         if (obj == null) return false;
         if (!(obj instanceof ChessPiece)) return false;
         ChessPiece other = (ChessPiece) obj;
+        System.out.println(this.getPieceType() == other.getPieceType() && this.getTeamColor() == other.getTeamColor());
         return this.getPieceType() == other.getPieceType() && this.getTeamColor() == other.getTeamColor();
     }
 }
