@@ -7,13 +7,16 @@ import java.util.ArrayList;
 
 public class ChessGetMoves {
 
-    public static boolean validateMove(ChessMove move) {
-        if ( !(0 < move.getStartPosition().getRow() && move.getStartPosition().getRow() < 9) ) return false;
-        if ( !(0 < move.getStartPosition().getColumn() && move.getStartPosition().getColumn() < 9) ) return false;
-        if ( !(0 < move.getEndPosition().getRow() && move.getEndPosition().getRow() < 9) ) return false;
-        if ( !(0 < move.getEndPosition().getColumn() && move.getEndPosition().getColumn() < 9) ) return false;
-        return true;
+    public static boolean validatePosition(ChessPosition position) {
+        if ( !(0 < position.getRow() && position.getRow() < 9) ) return false;
+        return 0 < position.getColumn() && position.getColumn() < 9;
     }
+
+    public static boolean validateMove(ChessMove move) {
+        if (!validatePosition(move.getStartPosition())) return false;
+        return validatePosition(move.getEndPosition());
+    }
+
     public static ArrayList<ChessMove> getMove(ChessBoard board, ChessPosition position) {
 
         ArrayList<ChessMove> moves = new ArrayList<>();
