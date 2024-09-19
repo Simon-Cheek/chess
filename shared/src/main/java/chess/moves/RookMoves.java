@@ -6,6 +6,8 @@ import java.util.ArrayList;
 
 public class RookMoves {
 
+    // Refactor this later to better abstract the two loops - could be one
+
     public static ArrayList<ChessMove> getRookMoves(ChessBoard board, ChessPosition position) {
 
         ArrayList<ChessMove> moves = new ArrayList<>();
@@ -19,19 +21,56 @@ public class RookMoves {
 
         // Vertical Moves
         for (int direction : directions) {
+            increment = 1;
             ChessPosition nextPos = new ChessPosition(
                     position.getRow() + increment * direction,
                     position.getColumn()
             );
+
+            while (ChessGetMoves.validatePosition(nextPos)) {
+
+                ChessPiece targetPiece = board.getPiece(nextPos);
+                if (targetPiece == null) {
+                    moves.add(new ChessMove(position, nextPos, null));
+                } else {
+                    if (targetPiece.getTeamColor() == otherTeam)
+                        moves.add(new ChessMove(position, nextPos, null));
+                    break;
+                }
+
+                increment++;
+                nextPos = new ChessPosition(
+                        position.getRow() + increment * direction,
+                        position.getColumn()
+                );
+            }
         }
 
         // Horizontal Moves
-        increment = 1;
         for (int direction : directions) {
+            increment = 1;
             ChessPosition nextPos = new ChessPosition(
                     position.getRow(),
                     position.getColumn() + increment * direction
             );
+
+            while (ChessGetMoves.validatePosition(nextPos)) {
+
+                ChessPiece targetPiece = board.getPiece(nextPos);
+                if (targetPiece == null) {
+                    moves.add(new ChessMove(position, nextPos, null));
+                } else {
+                    if (targetPiece.getTeamColor() == otherTeam)
+                        moves.add(new ChessMove(position, nextPos, null));
+                    break;
+                }
+
+                increment++;
+                nextPos = new ChessPosition(
+                        position.getRow(),
+                        position.getColumn() + increment * direction
+                );
+            }
         }
 
         return moves;

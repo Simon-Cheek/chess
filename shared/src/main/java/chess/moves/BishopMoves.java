@@ -14,7 +14,6 @@ public class BishopMoves {
                 ? ChessGame.TeamColor.WHITE
                 : ChessGame.TeamColor.BLACK;
 
-        // Array to define the four diagonal directions
         int[][] directions = {
                 {1, 1},
                 {1, -1},
@@ -45,7 +44,6 @@ public class BishopMoves {
                     break;
                 }
 
-                // Increment for next position in the same diagonal direction
                 increment++;
                 nextPos = new ChessPosition(
                         position.getRow() + increment * rowIncrement,
