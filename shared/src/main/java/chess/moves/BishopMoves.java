@@ -10,20 +10,49 @@ public class BishopMoves {
 
         ArrayList<ChessMove> moves = new ArrayList<>();
         ChessPiece piece = board.getPiece(position);
-        ChessGame.TeamColor otherTeam;
+        ChessGame.TeamColor otherTeam = (piece.getTeamColor() == ChessGame.TeamColor.BLACK)
+                ? ChessGame.TeamColor.WHITE
+                : ChessGame.TeamColor.BLACK;
 
-        // Set up other team
-        if (piece.getTeamColor() == ChessGame.TeamColor.BLACK) {
-            otherTeam = ChessGame.TeamColor.WHITE;
-        } else otherTeam = ChessGame.TeamColor.BLACK;
+        // Array to define the four diagonal directions
+        int[][] directions = {
+                {1, 1},
+                {1, -1},
+                {-1, 1},
+                {-1, -1}
+        };
 
-        // Up Right
+        // Loop through each direction
+        for (int[] direction : directions) {
+            int rowIncrement = direction[0];
+            int colIncrement = direction[1];
+            int increment = 1;
+            ChessPosition nextPos = new ChessPosition(
+                    position.getRow() + increment * rowIncrement,
+                    position.getColumn() + increment * colIncrement
+            );
 
-        // Up Left
+            while (ChessGetMoves.validatePosition(nextPos)) {
+                ChessPiece targetPiece = board.getPiece(nextPos);
 
-        // Down Right
+                // If the square is empty, add the move
+                if (targetPiece == null) {
+                    moves.add(new ChessMove(position, nextPos, null));
+                } else {
+                    // If there's an opponent piece, add the move but stop searching in this direction
+                    if (targetPiece.getTeamColor() == otherTeam)
+                        moves.add(new ChessMove(position, nextPos, null));
+                    break;
+                }
 
-        // Down Left
+                // Increment for next position in the same diagonal direction
+                increment++;
+                nextPos = new ChessPosition(
+                        position.getRow() + increment * rowIncrement,
+                        position.getColumn() + increment * colIncrement
+                );
+            }
+        }
 
         return moves;
     }
