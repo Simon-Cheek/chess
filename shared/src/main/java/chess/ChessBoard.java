@@ -52,10 +52,9 @@ public class ChessBoard {
         ChessBoard other = (ChessBoard) obj;
 
         for (int i = 1; i < 9; i++) {
-            for (int ii = 1; i < 9; ii++) {
+            for (int ii = 1; ii < 9; ii++) {
                 ChessPosition current = new ChessPosition(i, ii);
                 if (this.getPiece(current) == null) {
-                    System.out.println("null");
                     return other.getPiece(current) == null;
                 }
                 if (!(this.getPiece(current).equals(other.getPiece(current)))) return false;

@@ -27,8 +27,8 @@ public class ChessInitBoard {
 
         // White Bishops
         ChessPiece w_b = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP);
-        board.addPiece(new ChessPosition(1, 3), w_k);
-        board.addPiece(new ChessPosition(1, 6), w_k);
+        board.addPiece(new ChessPosition(1, 3), w_b);
+        board.addPiece(new ChessPosition(1, 6), w_b);
 
         // White Royalty
         ChessPiece w_q = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.QUEEN);
