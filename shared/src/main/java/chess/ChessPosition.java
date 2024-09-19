@@ -56,6 +56,6 @@ public class ChessPosition {
 
     @Override
     public String toString() {
-        return "Starting Position is " + this.row + " x " + this.col;
+        return this.row + " x " + this.col;
     }
 }

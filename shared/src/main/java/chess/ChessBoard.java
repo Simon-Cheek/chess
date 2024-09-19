@@ -12,7 +12,6 @@ public class ChessBoard {
 
     public ChessBoard() {
         this.board = new ChessPiece[8][8];
-        this.resetBoard();
     }
 
     /**
@@ -53,7 +52,7 @@ public class ChessBoard {
         ChessBoard other = (ChessBoard) obj;
 
         for (int i = 1; i < 9; i++) {
-            for (int ii = 1; i < 9; i++) {
+            for (int ii = 1; i < 9; ii++) {
                 ChessPosition current = new ChessPosition(i, ii);
                 if (this.getPiece(current) == null) {
                     System.out.println("null");

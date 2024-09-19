@@ -74,4 +74,9 @@ public class ChessMove {
         }
         return this.getPromotionPiece().equals(other.getPromotionPiece());
     }
+
+    @Override
+    public String toString() {
+        return "{" + this.getEndPosition().getRow() + ":" + this.getEndPosition().getColumn() + "}";
+    }
 }
