@@ -10,65 +10,52 @@ public class PawnMoves {
 
         ArrayList<ChessMove> moves = new ArrayList<>();
         ChessPiece piece = board.getPiece(position);
+        ChessGame.TeamColor otherTeam = (piece.getTeamColor() == ChessGame.TeamColor.WHITE) ?
+                ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
 
-        // White moves up one or up two if in starting position if unblocked
-        if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
+        // Determine direction of movement based on team
+        int direction = (piece.getTeamColor() == ChessGame.TeamColor.WHITE) ? 1 : -1;
+        int startRow = (piece.getTeamColor() == ChessGame.TeamColor.WHITE) ? 2 : 7;
+        int promotionRow = (piece.getTeamColor() == ChessGame.TeamColor.WHITE) ? 8 : 1;
 
-            // Possible Moves
-            ChessPosition inFront = new ChessPosition(position.getRow() + 1, position.getColumn());
-            ChessPosition upTwo = new ChessPosition(position.getRow() + 2, position.getColumn());
+        // Forward move (one space)
+        ChessPosition inFront = new ChessPosition(position.getRow() + direction, position.getColumn());
+        if (ChessGetMoves.validatePosition(inFront) && board.getPiece(inFront) == null) {
+            ChessPiece.PieceType promotion = (inFront.getRow() == promotionRow) ? ChessPiece.PieceType.QUEEN : null;
+            ChessMove moveUpOne = new ChessMove(position, inFront, promotion);
 
-            if (board.getPiece(inFront) == null) {
+            if (ChessGetMoves.validateMove(moveUpOne)) moves.add(moveUpOne);
 
-                // Move One Space Ahead
-                ChessPiece.PieceType promotion = null;
-                if (inFront.getRow() == 8) promotion = ChessPiece.PieceType.QUEEN;
-                ChessMove moveUpOne = new ChessMove(position, inFront, promotion);
-                if (ChessGetMoves.validateMove(moveUpOne)) moves.add(moveUpOne);
+            // Forward move (two spaces) if starting position
+            if (position.getRow() == startRow) {
 
-                // Move Two Spaces Ahead
-                if (position.getRow() == 2 &&
-                        (board.getPiece(upTwo) == null ||
-                                board.getPiece(upTwo).getTeamColor() == ChessGame.TeamColor.BLACK)) {
+                ChessPosition upTwo = new ChessPosition(position.getRow() + 2 * direction, position.getColumn());
+                ChessPosition between = new ChessPosition(position.getRow() + direction, position.getColumn());
+
+                if (ChessGetMoves.validatePosition(upTwo) &&
+                        board.getPiece(upTwo) == null && board.getPiece(between) == null) {
                     ChessMove moveUpTwo = new ChessMove(position, upTwo, null);
+
                     if (ChessGetMoves.validateMove(moveUpTwo)) moves.add(moveUpTwo);
                 }
-
-            } else if (board.getPiece(inFront).getTeamColor() == ChessGame.TeamColor.BLACK) {
-                // Move One Space Ahead
-                ChessPiece.PieceType promotion = null;
-                if (inFront.getRow() == 8) promotion = ChessPiece.PieceType.QUEEN;
-                ChessMove moveUpOne = new ChessMove(position, inFront, promotion);
-                if (ChessGetMoves.validateMove(moveUpOne)) moves.add(moveUpOne);
             }
-        } else {
+        }
 
-            // Black Pawn Moves
-            ChessPosition inFront = new ChessPosition(position.getRow() - 1, position.getColumn());
-            ChessPosition upTwo = new ChessPosition(position.getRow() - 2, position.getColumn());
+        // Diagonal Captures
+        int[] diagonalOffsets = {-1, 1};
 
-            if (board.getPiece(inFront) == null) {
+        for (int offset : diagonalOffsets) {
+            ChessPosition diagonalPos = new ChessPosition(position.getRow() + direction, position.getColumn() + offset);
 
-                // Move One Space Ahead
-                ChessPiece.PieceType promotion = null;
-                if (inFront.getRow() == 1) promotion = ChessPiece.PieceType.QUEEN;
-                ChessMove moveUpOne = new ChessMove(position, inFront, promotion);
-                if (ChessGetMoves.validateMove(moveUpOne)) moves.add(moveUpOne);
+            if (ChessGetMoves.validatePosition(diagonalPos)) {
+                ChessPiece targetPiece = board.getPiece(diagonalPos);
 
-                // Move Two Spaces Ahead
-                if (position.getRow() == 7 &&
-                        (board.getPiece(upTwo) == null ||
-                                board.getPiece(upTwo).getTeamColor() == ChessGame.TeamColor.WHITE)) {
-                    ChessMove moveUpTwo = new ChessMove(position, upTwo, null);
-                    if (ChessGetMoves.validateMove(moveUpTwo)) moves.add(moveUpTwo);
+                if (targetPiece != null && targetPiece.getTeamColor() == otherTeam) {
+                    ChessPiece.PieceType promotion = (diagonalPos.getRow() == promotionRow) ? ChessPiece.PieceType.QUEEN : null;
+                    ChessMove diagonalCapture = new ChessMove(position, diagonalPos, promotion);
+
+                    if (ChessGetMoves.validateMove(diagonalCapture)) moves.add(diagonalCapture);
                 }
-
-            } else if (board.getPiece(inFront).getTeamColor() == ChessGame.TeamColor.WHITE) {
-                // Move One Space Ahead
-                ChessPiece.PieceType promotion = null;
-                if (inFront.getRow() == 1) promotion = ChessPiece.PieceType.QUEEN;
-                ChessMove moveUpOne = new ChessMove(position, inFront, promotion);
-                if (ChessGetMoves.validateMove(moveUpOne)) moves.add(moveUpOne);
             }
         }
         return moves;

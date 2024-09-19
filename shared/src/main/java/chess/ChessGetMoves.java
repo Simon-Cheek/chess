@@ -2,6 +2,7 @@ package chess;
 
 import chess.moves.BishopMoves;
 import chess.moves.PawnMoves;
+import chess.moves.RookMoves;
 
 import java.util.ArrayList;
 
@@ -23,17 +24,15 @@ public class ChessGetMoves {
         ChessPiece piece = board.getPiece(position);
 
         // Pawn Moves
-        if (piece.getPieceType() == ChessPiece.PieceType.PAWN) {
-            return PawnMoves.getPawnMoves(board, position);
-        }
+        if (piece.getPieceType() == ChessPiece.PieceType.PAWN) return PawnMoves.getPawnMoves(board, position);
+
 
         // Bishop Moves
-        if (piece.getPieceType() == ChessPiece.PieceType.BISHOP) {
-            return BishopMoves.getBishopMoves(board, position);
-        }
+        if (piece.getPieceType() == ChessPiece.PieceType.BISHOP) return BishopMoves.getBishopMoves(board, position);
+
 
         // Rook Moves
-        if (piece.getPieceType() == ChessPiece.PieceType.ROOK) {}
+        if (piece.getPieceType() == ChessPiece.PieceType.ROOK) return RookMoves.getRookMoves(board, position);
 
         // Knight Moves
         if (piece.getPieceType() == ChessPiece.PieceType.KNIGHT) {}
