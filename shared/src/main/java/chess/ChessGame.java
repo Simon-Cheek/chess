@@ -16,7 +16,7 @@ public class ChessGame {
     public ChessGame() {
         this.teamColor = TeamColor.WHITE; // Initialize turn to White
         this.board = new ChessBoard();
-        this.board.resetBoard();
+        this.board.resetBoard(); // Create new board and initialize to new game
     }
 
     /**
@@ -62,6 +62,27 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         throw new RuntimeException("Not implemented");
+    }
+
+    /**
+     * Determines if the given position is in danger
+     */
+    private boolean isInDanger(ChessPosition position) {
+        for (int i = 1; i < 9; i ++) {
+            for (int ii = 1; ii < 9; ii++) {
+
+                // Iterate through all positions and check if it can move to the given position
+                ChessPosition newPosition = new ChessPosition(i, ii);
+                ChessPiece newPiece = this.board.getPiece(newPosition);
+                if (newPiece != null) {
+                    Collection<ChessMove> moves =  newPiece.pieceMoves(this.board, newPosition);
+                    for (ChessMove move : moves) {
+                        if (move.getEndPosition() == position) return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     /**
