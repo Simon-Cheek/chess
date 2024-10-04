@@ -184,16 +184,23 @@ public class ChessGame {
         if (kingPosition != null) {
 
             // Simulate every possible move and check if King is in check after
+            Collection<ChessMove> validMoves = new ArrayList<ChessMove>();
+
             for (int i = 1; i < 9; i ++) {
                 for (int ii = 1; ii < 9; ii++) {
 
                     ChessPosition newPosition = new ChessPosition(i, ii);
                     ChessPiece newPiece = this.board.getPiece(newPosition);
 
-                    // TODO: FINISH LATER
+                    // Check every possible move by own color and make sure there is at least one valid move
+                    if (newPiece != null && newPiece.getTeamColor() == teamColor) {
+                        Collection<ChessMove> validPieceMoves = this.validMoves(newPosition);
+                        validMoves.addAll(validPieceMoves);
+                    }
 
                 }
             }
+            return validMoves.isEmpty();
 
         }
         return false;
