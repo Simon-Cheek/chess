@@ -96,9 +96,13 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
 
-        if (!this.validMoves(move.getStartPosition()).contains(move)) throw new InvalidMoveException("Not a valid move");
+        Collection<ChessMove> validMoves = this.validMoves(move.getStartPosition());
+
+        if (validMoves == null || validMoves.isEmpty() || !validMoves.contains(move)) throw new InvalidMoveException("Not a valid move");
 
         ChessPiece startingPiece = this.board.getPiece(move.getStartPosition());
+
+        if (startingPiece.getTeamColor() != this.teamColor) throw new InvalidMoveException("Not a valid move");
 
         // Place starting position piece on top of end position
         this.board.addPiece(move.getEndPosition(), startingPiece);
