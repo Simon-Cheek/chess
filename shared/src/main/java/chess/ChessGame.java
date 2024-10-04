@@ -197,11 +197,9 @@ public class ChessGame {
                         Collection<ChessMove> validPieceMoves = this.validMoves(newPosition);
                         validMoves.addAll(validPieceMoves);
                     }
-
                 }
             }
-            return validMoves.isEmpty();
-
+            return validMoves.isEmpty(); // If no valid moves, King is in Checkmate
         }
         return false;
     }
@@ -214,7 +212,29 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        if (isInCheck(teamColor)) return false;
+        ChessPosition kingPosition = findKing(teamColor);
+        if (kingPosition != null) {
+
+            // Simulate every possible move and check if King is in check after
+            Collection<ChessMove> validMoves = new ArrayList<ChessMove>();
+
+            for (int i = 1; i < 9; i ++) {
+                for (int ii = 1; ii < 9; ii++) {
+
+                    ChessPosition newPosition = new ChessPosition(i, ii);
+                    ChessPiece newPiece = this.board.getPiece(newPosition);
+
+                    // Check every possible move by own color and make sure there is at least one valid move
+                    if (newPiece != null && newPiece.getTeamColor() == teamColor) {
+                        Collection<ChessMove> validPieceMoves = this.validMoves(newPosition);
+                        validMoves.addAll(validPieceMoves);
+                    }
+                }
+            }
+            return validMoves.isEmpty(); // If no valid moves, King is in Checkmate
+        }
+        return false;
     }
 
     /**
