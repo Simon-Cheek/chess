@@ -200,15 +200,10 @@ public class ChessGame {
                     // Check every possible move by own color and make sure there is at least one valid move
                     if (newPiece != null && newPiece.getTeamColor() == teamColor) {
                         Collection<ChessMove> validPieceMoves = this.validMoves(newPosition);
-                        System.out.println("PRINTING OUT ALL VALID PIECE MOVES FOR");
-                        System.out.println(newPiece);
-                        System.out.println(validPieceMoves);
-                        validMoves.addAll(validPieceMoves);
+                        if (validPieceMoves != null) validMoves.addAll(validPieceMoves);
                     }
                 }
             }
-            System.out.println("PRINTING ALL VALID FINAL MOVES");
-            System.out.println(validMoves);
             return validMoves.isEmpty(); // If no valid moves, King is in Checkmate
         }
         return false;
