@@ -1,5 +1,7 @@
 package server;
 
+import com.google.gson.Gson;
+import model.UserRecord;
 import spark.*;
 
 public class Server {
@@ -25,5 +27,8 @@ public class Server {
         Spark.awaitStop();
     }
 
-    private Object registerUser(Request req, Response res) {}
+    private Object registerUser(Request req, Response res) {
+        UserRecord user = new Gson().fromJson(req.body(), UserRecord.class);
+        return new Gson().toJson(user);
+    }
 }
