@@ -21,8 +21,8 @@ public class UserDAO {
     }
 
     // Creates a new user
-    public void createUser(String username, String password, String email) {
-        this.userRecords.add(new UserRecord(username, password, email));
+    public void createUser(UserRecord user) {
+        this.userRecords.add(user);
     }
 
 }
