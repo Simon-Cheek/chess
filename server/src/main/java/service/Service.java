@@ -59,6 +59,15 @@ public class Service {
         return user;
     }
 
+    public int createGame(String authToken, String gameName) throws ResponseException {
+        this.verifyUser(authToken);
+        // Make sure game doesn't already exist with name
+        if (this.gameDAO.findGame(gameName) != null) throw new ResponseException("Error: bad request", 400);
+
+        // Create Game with GameName and return string
+        return this.gameDAO.createGame(gameName);
+    }
+
     // Logs user out EVERYWHERE (Deletes all authRecords associated with the user)
     public void logoutUser(String authToken) throws ResponseException {
         AuthRecord user = verifyUser(authToken);

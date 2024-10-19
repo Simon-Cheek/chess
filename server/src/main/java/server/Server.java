@@ -29,6 +29,7 @@ public class Server {
 
         // Register your endpoints and handle exceptions here.
         Spark.get("/game", this::listGames);
+        Spark.post("/game", this::createGame);
         Spark.post("/user", this::registerUser);
         Spark.post("/session", this::loginUser);
         Spark.delete("/session", this::logoutUser);
@@ -54,6 +55,16 @@ public class Server {
         return new Gson().toJson(auth);
     }
 
+    private Object createGame(Request req, Response res) throws ResponseException {
+        String authToken = req.headers("authorization");
+        record GameName(String gameName){}
+
+        GameName gameReq = new Gson().fromJson(req.body(), GameName.class);
+        int gameId = this.service.createGame(authToken, gameReq.gameName());
+
+        return new Gson().toJson(Map.of("gameID", gameId));
+    }
+
     private Object registerUser(Request req, Response res) throws ResponseException {
         UserRecord user = new Gson().fromJson(req.body(), UserRecord.class);
         AuthRecord auth = this.service.registerUser(user);
@@ -61,7 +72,6 @@ public class Server {
     }
 
     private Object logoutUser(Request req, Response res) throws ResponseException {
-
         String authToken = req.headers("authorization");
 
         this.service.logoutUser(authToken);
