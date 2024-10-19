@@ -25,4 +25,8 @@ public class UserDAO {
         this.userRecords.add(user);
     }
 
+    public void deleteUsers() {
+        this.userRecords = new ArrayList<UserRecord>();
+    }
+
 }

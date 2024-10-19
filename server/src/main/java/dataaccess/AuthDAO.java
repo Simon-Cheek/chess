@@ -18,8 +18,13 @@ public class AuthDAO {
     public AuthRecord createAuth(String username) {
         String token = UUID.randomUUID().toString();
         AuthRecord auth = new AuthRecord(token, username);
-        authRecords.add(auth);
+        this.authRecords.add(auth);
         return auth;
+    }
+
+    // Clear the Database
+    public void deleteAuths() {
+        this.authRecords = new ArrayList<AuthRecord>();
     }
 
 }

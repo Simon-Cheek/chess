@@ -31,4 +31,10 @@ public class Service {
         // Add and return Authentication Information
         return this.authDAO.createAuth(user.username());
     }
+
+    public void deleteDB() {
+        this.authDAO.deleteAuths();
+        this.gameDAO.deleteGames();
+        this.userDAO.deleteUsers();
+    }
 }

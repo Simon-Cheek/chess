@@ -48,6 +48,7 @@ public class Server {
 
     private Object deleteAll(Request req, Response res) {
         res.status(200);
+        this.service.deleteDB();
         return "{}";
     }
 
