@@ -147,6 +147,17 @@ public class ServiceTests {
 
         AuthRecord auth = service.registerUser(newUser);
         service.createGame(auth.authToken(), "GameName");
+        assertDoesNotThrow(service::deleteDB);
+    }
+
+    @Test
+    @DisplayName("Can't clear DB without auth")
+    public void testClearDBNegative() throws ResponseException {
+        Service service = new Service();
+        UserRecord newUser = new UserRecord("testUser", "testPass", "email@gmail");
+
+        AuthRecord auth = service.registerUser(newUser);
+        service.createGame(auth.authToken(), "GameName");
 
         // Can't query games once db is gone
         assertDoesNotThrow(service::deleteDB);
