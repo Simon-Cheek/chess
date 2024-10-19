@@ -94,7 +94,7 @@ public class Service {
 
     // Logs user out on existing session
     public void logoutUser(String authToken) throws ResponseException {
-        AuthRecord user = verifyUser(authToken);
+        this.verifyUser(authToken);
         this.authDAO.deleteAuthByToken(authToken);
     }
 
