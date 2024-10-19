@@ -1,5 +1,6 @@
 package service;
 
+import chess.ChessGame;
 import dataaccess.AuthDAO;
 import dataaccess.GameDAO;
 import dataaccess.UserDAO;
@@ -59,11 +60,11 @@ public class Service {
         return user;
     }
 
-    public void joinGame(String authToken, String playerColor, int gameID) throws ResponseException {
+    public void joinGame(String authToken, ChessGame.TeamColor playerColor, int gameID) throws ResponseException {
         AuthRecord user = this.verifyUser(authToken);
 
         // Make sure Color is Correct
-        if ( playerColor == null || (!playerColor.equals("BLACK") && !playerColor.equals("WHITE")))
+        if ( playerColor == null || (!playerColor.equals(ChessGame.TeamColor.WHITE) && !playerColor.equals(ChessGame.TeamColor.BLACK)))
             throw new ResponseException("Error: bad request", 400);
 
         // Make sure Game Exists
@@ -71,7 +72,7 @@ public class Service {
         if (game == null) throw new ResponseException("Error: bad request", 400);
 
         // Make sure color isn't taken
-        if (playerColor.equals("WHITE")) {
+        if (playerColor.equals(ChessGame.TeamColor.WHITE)) {
             if (game.whiteUsername() != null) throw new ResponseException("Error: already taken", 403);
 
         } else {
@@ -91,10 +92,10 @@ public class Service {
         return this.gameDAO.createGame(gameName);
     }
 
-    // Logs user out EVERYWHERE (Deletes all authRecords associated with the user)
+    // Logs user out on existing session
     public void logoutUser(String authToken) throws ResponseException {
         AuthRecord user = verifyUser(authToken);
-        this.authDAO.deleteAuthByUser(user.username());
+        this.authDAO.deleteAuthByToken(authToken);
     }
 
     // Lists all games after verifying user

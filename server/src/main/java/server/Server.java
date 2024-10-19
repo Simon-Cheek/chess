@@ -1,5 +1,6 @@
 package server;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import exception.ResponseException;
 import model.AuthRecord;
@@ -52,7 +53,7 @@ public class Server {
     }
 
     private Object joinGame(Request req, Response res) throws ResponseException {
-        record JoinRequest(String playerColor, int gameID){}
+        record JoinRequest(ChessGame.TeamColor playerColor, int gameID){}
 
         String authToken = req.headers("authorization");
         JoinRequest joinRequest = new Gson().fromJson(req.body(), JoinRequest.class);

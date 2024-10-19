@@ -29,8 +29,8 @@ public class GameDAO {
         return id;
     }
 
-    public void joinGame(GameRecord game, String color, String username) {
-        if (color.equals("WHITE")) {
+    public void joinGame(GameRecord game, ChessGame.TeamColor color, String username) {
+        if (color.equals(ChessGame.TeamColor.WHITE)) {
             GameRecord newGame = new GameRecord(game.gameID(), username, game.blackUsername(), game.gameName(), game.game());
             this.gameRecords.remove(game);
             this.gameRecords.add(newGame);

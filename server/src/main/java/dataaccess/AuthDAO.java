@@ -29,8 +29,8 @@ public class AuthDAO {
         return null;
     }
 
-    public void deleteAuthByUser(String username) {
-        this.authRecords.removeIf(auth -> auth.username().equals(username));
+    public void deleteAuthByToken(String authToken) {
+        this.authRecords.removeIf(auth -> auth.authToken().equals(authToken));
     }
 
     // Clear the Database
