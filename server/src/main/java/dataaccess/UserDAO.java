@@ -15,7 +15,7 @@ public class UserDAO {
     // Returns UserRecord object that matches given username
     public UserRecord findUser(String username) {
         for (UserRecord user : this.userRecords) {
-            if (user.username().equals(username)) return user;
+            if (user.username().equals(username)) { return user; }
         }
         return null;
     }

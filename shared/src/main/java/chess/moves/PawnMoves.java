@@ -33,11 +33,11 @@ public class PawnMoves {
             if (inFront.getRow() == promotionRow) {
                 for (ChessPiece.PieceType promotion : promotionPieces) {
                     ChessMove moveUpOne = new ChessMove(position, inFront, promotion);
-                    if (ChessGetMoves.validateMove(moveUpOne)) moves.add(moveUpOne);
+                    if (ChessGetMoves.validateMove(moveUpOne)) { moves.add(moveUpOne); };
                 }
             } else {
                 ChessMove moveUpOne = new ChessMove(position, inFront, null);
-                if (ChessGetMoves.validateMove(moveUpOne)) moves.add(moveUpOne);
+                if (ChessGetMoves.validateMove(moveUpOne)) { moves.add(moveUpOne); }
             }
 
             // Forward move (two spaces) if starting position
@@ -47,7 +47,7 @@ public class PawnMoves {
                 if (ChessGetMoves.validatePosition(upTwo) &&
                         board.getPiece(upTwo) == null && board.getPiece(inFront) == null) {
                     ChessMove moveUpTwo = new ChessMove(position, upTwo, null);
-                    if (ChessGetMoves.validateMove(moveUpTwo)) moves.add(moveUpTwo);
+                    if (ChessGetMoves.validateMove(moveUpTwo)) { moves.add(moveUpTwo); }
                 }
             }
         }
@@ -61,17 +61,15 @@ public class PawnMoves {
             if (ChessGetMoves.validatePosition(diagonalPos)) {
                 ChessPiece targetPiece = board.getPiece(diagonalPos);
 
-                if (targetPiece != null && targetPiece.getTeamColor() == otherTeam) {
+                if (targetPiece != null && targetPiece.getTeamColor() == otherTeam && diagonalPos.getRow() == promotionRow) {
                     // Add all promotion pieces for diagonal captures if promotion row
-                    if (diagonalPos.getRow() == promotionRow) {
                         for (ChessPiece.PieceType promotion : promotionPieces) {
                             ChessMove diagonalCapture = new ChessMove(position, diagonalPos, promotion);
-                            if (ChessGetMoves.validateMove(diagonalCapture)) moves.add(diagonalCapture);
+                            if (ChessGetMoves.validateMove(diagonalCapture)) { moves.add(diagonalCapture); }
                         }
-                    } else {
-                        ChessMove diagonalCapture = new ChessMove(position, diagonalPos, null);
-                        if (ChessGetMoves.validateMove(diagonalCapture)) moves.add(diagonalCapture);
-                    }
+                } else if (targetPiece != null && targetPiece.getTeamColor() == otherTeam) {
+                    ChessMove diagonalCapture = new ChessMove(position, diagonalPos, null);
+                    if (ChessGetMoves.validateMove(diagonalCapture)) { moves.add(diagonalCapture); }
                 }
             }
         }

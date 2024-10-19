@@ -3,7 +3,6 @@ package service;
 import chess.ChessGame;
 import exception.ResponseException;
 import model.AuthRecord;
-import model.GameRecord;
 import model.LoginRequest;
 import model.UserRecord;
 import org.junit.jupiter.api.DisplayName;

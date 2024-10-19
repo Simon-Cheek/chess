@@ -43,14 +43,14 @@ public class GameDAO {
 
     public GameRecord findGame(String name) {
         for (GameRecord game : gameRecords) {
-            if (game.gameName().equals(name)) return game;
+            if (game.gameName().equals(name)) { return game; }
         }
         return null;
     }
 
     public GameRecord findGame(int gameID) {
         for (GameRecord game : gameRecords) {
-            if (game.gameID() == gameID) return game;
+            if (game.gameID() == gameID) { return game; }
         }
         return null;
     }

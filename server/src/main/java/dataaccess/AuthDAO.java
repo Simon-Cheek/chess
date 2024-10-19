@@ -24,7 +24,7 @@ public class AuthDAO {
 
     public AuthRecord getAuthByToken(String authToken) {
         for (AuthRecord auth : authRecords) {
-            if (authToken.equals(auth.authToken())) return auth;
+            if (authToken.equals(auth.authToken())) { return auth; }
         }
         return null;
     }

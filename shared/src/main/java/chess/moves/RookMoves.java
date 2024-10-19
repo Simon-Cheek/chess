@@ -33,8 +33,9 @@ public class RookMoves {
                 if (targetPiece == null) {
                     moves.add(new ChessMove(position, nextPos, null));
                 } else {
-                    if (targetPiece.getTeamColor() == otherTeam)
+                    if (targetPiece.getTeamColor() == otherTeam) {
                         moves.add(new ChessMove(position, nextPos, null));
+                    }
                     break;
                 }
 
@@ -61,7 +62,7 @@ public class RookMoves {
                     moves.add(new ChessMove(position, nextPos, null));
                 } else {
                     if (targetPiece.getTeamColor() == otherTeam)
-                        moves.add(new ChessMove(position, nextPos, null));
+                    { moves.add(new ChessMove(position, nextPos, null)); }
                     break;
                 }
 

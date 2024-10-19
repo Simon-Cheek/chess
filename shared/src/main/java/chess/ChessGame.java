@@ -120,6 +120,14 @@ public class ChessGame {
         this.setTeamTurn(this.getTeamTurn() == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE);
     }
 
+    private boolean isInDangerHelper(ChessPosition position, ChessPiece newPiece, ChessPosition newPosition) {
+        Collection<ChessMove> moves = newPiece.pieceMoves(this.board, newPosition);
+        for (ChessMove move : moves) {
+            if (move.getEndPosition().equals(position)) return true;
+        }
+        return false;
+    }
+
     /**
      * Determines if the given position is in danger
      */
@@ -131,10 +139,7 @@ public class ChessGame {
                 ChessPosition newPosition = new ChessPosition(i, ii);
                 ChessPiece newPiece = this.board.getPiece(newPosition);
                 if (newPiece != null) {
-                    Collection<ChessMove> moves = newPiece.pieceMoves(this.board, newPosition);
-                    for (ChessMove move : moves) {
-                        if (move.getEndPosition().equals(position)) return true;
-                    }
+                     if (isInDangerHelper(position, newPiece, newPosition)) { return true; };
                 }
             }
         }
@@ -177,6 +182,26 @@ public class ChessGame {
         return false;
     }
 
+    public boolean checkForAnyOptions(ChessGame.TeamColor teamColor) {
+        // Simulate every possible move and check if King is in check after
+        Collection<ChessMove> validMoves = new ArrayList<ChessMove>();
+
+        for (int i = 1; i < 9; i ++) {
+            for (int ii = 1; ii < 9; ii++) {
+
+                ChessPosition newPosition = new ChessPosition(i, ii);
+                ChessPiece newPiece = this.board.getPiece(newPosition);
+
+                // Check every possible move by own color and make sure there is at least one valid move
+                if (newPiece != null && newPiece.getTeamColor() == teamColor) {
+                    Collection<ChessMove> validPieceMoves = this.validMoves(newPosition);
+                    if (validPieceMoves != null) validMoves.addAll(validPieceMoves);
+                }
+            }
+        }
+        return validMoves.isEmpty(); // If no valid moves, King is in Checkmate
+    }
+
     /**
      * Determines if the given team is in checkmate
      *
@@ -187,24 +212,7 @@ public class ChessGame {
         if (!isInCheck(teamColor)) return false;
         ChessPosition kingPosition = findKing(teamColor);
         if (kingPosition != null) {
-
-            // Simulate every possible move and check if King is in check after
-            Collection<ChessMove> validMoves = new ArrayList<ChessMove>();
-
-            for (int i = 1; i < 9; i ++) {
-                for (int ii = 1; ii < 9; ii++) {
-
-                    ChessPosition newPosition = new ChessPosition(i, ii);
-                    ChessPiece newPiece = this.board.getPiece(newPosition);
-
-                    // Check every possible move by own color and make sure there is at least one valid move
-                    if (newPiece != null && newPiece.getTeamColor() == teamColor) {
-                        Collection<ChessMove> validPieceMoves = this.validMoves(newPosition);
-                        if (validPieceMoves != null) validMoves.addAll(validPieceMoves);
-                    }
-                }
-            }
-            return validMoves.isEmpty(); // If no valid moves, King is in Checkmate
+            return checkForAnyOptions(teamColor);
         }
         return false;
     }
@@ -220,24 +228,7 @@ public class ChessGame {
         if (isInCheck(teamColor)) return false;
         ChessPosition kingPosition = findKing(teamColor);
         if (kingPosition != null) {
-
-            // Simulate every possible move and check if King is in check after
-            Collection<ChessMove> validMoves = new ArrayList<ChessMove>();
-
-            for (int i = 1; i < 9; i ++) {
-                for (int ii = 1; ii < 9; ii++) {
-
-                    ChessPosition newPosition = new ChessPosition(i, ii);
-                    ChessPiece newPiece = this.board.getPiece(newPosition);
-
-                    // Check every possible move by own color and make sure there is at least one valid move
-                    if (newPiece != null && newPiece.getTeamColor() == teamColor) {
-                        Collection<ChessMove> validPieceMoves = this.validMoves(newPosition);
-                        if (validPieceMoves != null) validMoves.addAll(validPieceMoves);
-                    }
-                }
-            }
-            return validMoves.isEmpty(); // If no valid moves, King is in Checkmate
+            return checkForAnyOptions(teamColor);
         }
         return false;
     }

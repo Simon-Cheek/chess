@@ -28,11 +28,11 @@ public class Service {
 
         // Make sure user is complete
         if (user.password() == null || user.username() == null || user.email() == null)
-            throw new ResponseException("Error: bad request", 400);
+        { throw new ResponseException("Error: bad request", 400); }
 
         // Make sure user doesn't already exist
         UserRecord userRecord = this.userDAO.findUser(user.username());
-        if (userRecord != null) throw new ResponseException("Error: already taken", 403);
+        if (userRecord != null) { throw new ResponseException("Error: already taken", 403); }
 
         // Create User in user table
         this.userDAO.createUser(user);
@@ -47,16 +47,16 @@ public class Service {
         // Verify user with given credentials
         UserRecord userRecord = this.userDAO.findUser(login.username());
         if (userRecord == null || !userRecord.password().equals(login.password()))
-            throw new ResponseException("Error: unauthorized", 401);
+        { throw new ResponseException("Error: unauthorized", 401); }
 
         // Create authToken and return
         return this.authDAO.createAuth(login.username());
     }
 
     public AuthRecord verifyUser(String authToken) throws ResponseException {
-        if (authToken == null) throw new ResponseException("Error: unauthorized", 401);
+        if (authToken == null) { throw new ResponseException("Error: unauthorized", 401); }
         AuthRecord user = this.authDAO.getAuthByToken(authToken);
-        if (user == null) throw new ResponseException("Error: unauthorized", 401);
+        if (user == null) { throw new ResponseException("Error: unauthorized", 401); }
         return user;
     }
 
@@ -69,14 +69,14 @@ public class Service {
 
         // Make sure Game Exists
         GameRecord game = this.gameDAO.findGame(gameID);
-        if (game == null) throw new ResponseException("Error: bad request", 400);
+        if (game == null) { throw new ResponseException("Error: bad request", 400); }
 
         // Make sure color isn't taken
         if (playerColor.equals(ChessGame.TeamColor.WHITE)) {
-            if (game.whiteUsername() != null) throw new ResponseException("Error: already taken", 403);
+            if (game.whiteUsername() != null) { throw new ResponseException("Error: already taken", 403); }
 
         } else {
-            if (game.blackUsername() != null) throw new ResponseException("Error: already taken", 403);
+            if (game.blackUsername() != null) { throw new ResponseException("Error: already taken", 403); }
         }
 
         // Join Game
@@ -86,7 +86,7 @@ public class Service {
     public int createGame(String authToken, String gameName) throws ResponseException {
         this.verifyUser(authToken);
         // Make sure game doesn't already exist with name
-        if (this.gameDAO.findGame(gameName) != null) throw new ResponseException("Error: bad request", 400);
+        if (this.gameDAO.findGame(gameName) != null) { throw new ResponseException("Error: bad request", 400); }
 
         // Create Game with GameName and return string
         return this.gameDAO.createGame(gameName);

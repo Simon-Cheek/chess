@@ -65,10 +65,10 @@ public class ChessMove {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (!(obj instanceof ChessMove other)) return false;
-        if (!this.getStartPosition().equals(other.getStartPosition())) return false;
-        if (!this.getEndPosition().equals(other.getEndPosition())) return false;
+        if (this == obj) { return true; }
+        if (!(obj instanceof ChessMove other)) { return false; }
+        if (!this.getStartPosition().equals(other.getStartPosition())) { return false; }
+        if (!this.getEndPosition().equals(other.getEndPosition())) { return false; }
         if (this.getPromotionPiece() == null) {
             return other.getPromotionPiece() == null;
         }

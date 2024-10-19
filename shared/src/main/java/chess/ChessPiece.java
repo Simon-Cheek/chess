@@ -59,8 +59,8 @@ public class ChessPiece {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) return false;
-        if (!(obj instanceof ChessPiece)) return false;
+        if (obj == null) { return false; }
+        if (!(obj instanceof ChessPiece)) { return false; }
         ChessPiece other = (ChessPiece) obj;
         return this.getPieceType() == other.getPieceType() && this.getTeamColor() == other.getTeamColor();
     }

@@ -39,8 +39,9 @@ public class BishopMoves {
                     moves.add(new ChessMove(position, nextPos, null));
                 } else {
                     // If there's an opponent piece, add the move but stop searching in this direction
-                    if (targetPiece.getTeamColor() == otherTeam)
+                    if (targetPiece.getTeamColor() == otherTeam) {
                         moves.add(new ChessMove(position, nextPos, null));
+                    }
                     break;
                 }
 
