@@ -3,11 +3,15 @@ package server;
 import com.google.gson.Gson;
 import exception.ResponseException;
 import model.AuthRecord;
+import model.GameRecord;
 import model.LoginRequest;
 import model.UserRecord;
 import spark.*;
 
 import service.Service;
+
+import java.util.ArrayList;
+import java.util.Map;
 
 public class Server {
 
@@ -24,8 +28,10 @@ public class Server {
         Spark.staticFiles.location("web");
 
         // Register your endpoints and handle exceptions here.
+        Spark.get("/game", this::listGames);
         Spark.post("/user", this::registerUser);
         Spark.post("/session", this::loginUser);
+        Spark.delete("/session", this::logoutUser);
         Spark.delete("/db", this::deleteAll);
         Spark.exception(ResponseException.class, this::exceptionHandler);
 
@@ -52,6 +58,20 @@ public class Server {
         UserRecord user = new Gson().fromJson(req.body(), UserRecord.class);
         AuthRecord auth = this.service.registerUser(user);
         return new Gson().toJson(auth);
+    }
+
+    private Object logoutUser(Request req, Response res) throws ResponseException {
+
+        String authToken = req.headers("authorization");
+
+        this.service.logoutUser(authToken);
+        return "{}";
+    }
+
+    private Object listGames(Request req, Response res) throws ResponseException {
+        String authToken = req.headers("authorization");
+        ArrayList<GameRecord> games = this.service.listGames(authToken);
+        return new Gson().toJson(Map.of("games", games));
     }
 
     private Object deleteAll(Request req, Response res) {

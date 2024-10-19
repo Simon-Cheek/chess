@@ -16,4 +16,8 @@ public class GameDAO {
     public void deleteGames() {
         this.gameRecords = new ArrayList<GameRecord>();
     }
+
+    public ArrayList<GameRecord> getAllGames() {
+        return this.gameRecords;
+    }
 }

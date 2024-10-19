@@ -5,8 +5,11 @@ import dataaccess.GameDAO;
 import dataaccess.UserDAO;
 import exception.ResponseException;
 import model.AuthRecord;
+import model.GameRecord;
 import model.LoginRequest;
 import model.UserRecord;
+
+import java.util.ArrayList;
 
 public class Service {
 
@@ -47,6 +50,25 @@ public class Service {
 
         // Create authToken and return
         return this.authDAO.createAuth(login.username());
+    }
+
+    public AuthRecord verifyUser(String authToken) throws ResponseException {
+        if (authToken == null) throw new ResponseException("Error: unauthorized", 401);
+        AuthRecord user = this.authDAO.getAuthByToken(authToken);
+        if (user == null) throw new ResponseException("Error: unauthorized", 401);
+        return user;
+    }
+
+    // Logs user out EVERYWHERE (Deletes all authRecords associated with the user)
+    public void logoutUser(String authToken) throws ResponseException {
+        AuthRecord user = verifyUser(authToken);
+        this.authDAO.deleteAuthByUser(user.username());
+    }
+
+    // Lists all games after verifying user
+    public ArrayList<GameRecord> listGames(String authToken) throws ResponseException {
+        this.verifyUser(authToken);
+        return this.gameDAO.getAllGames();
     }
 
     public void deleteDB() {
