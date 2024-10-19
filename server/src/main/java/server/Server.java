@@ -3,6 +3,7 @@ package server;
 import com.google.gson.Gson;
 import exception.ResponseException;
 import model.AuthRecord;
+import model.LoginRequest;
 import model.UserRecord;
 import spark.*;
 
@@ -24,6 +25,7 @@ public class Server {
 
         // Register your endpoints and handle exceptions here.
         Spark.post("/user", this::registerUser);
+        Spark.post("/session", this::loginUser);
         Spark.delete("/db", this::deleteAll);
         Spark.exception(ResponseException.class, this::exceptionHandler);
 
@@ -40,6 +42,14 @@ public class Server {
         Spark.awaitStop();
     }
 
+    private Object loginUser(Request req, Response res) throws ResponseException {
+        System.out.println("Starting the login process");
+        LoginRequest login = new Gson().fromJson(req.body(), LoginRequest.class);
+        AuthRecord auth = this.service.loginUser(login);
+        System.out.println("This should not be reached");
+        return new Gson().toJson(auth);
+    }
+
     private Object registerUser(Request req, Response res) throws ResponseException {
         UserRecord user = new Gson().fromJson(req.body(), UserRecord.class);
         AuthRecord auth = this.service.registerUser(user);
@@ -54,6 +64,10 @@ public class Server {
 
     private void exceptionHandler(ResponseException ex, Request req, Response res) {
         res.status(ex.StatusCode());
-        res.body(new Gson().toJson(ex));
+
+        record ErrorMessage(String message) {}
+
+        ErrorMessage message = new ErrorMessage(ex.getMessage());
+        res.body(new Gson().toJson(message));
     }
 }

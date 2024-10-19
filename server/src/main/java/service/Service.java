@@ -5,6 +5,7 @@ import dataaccess.GameDAO;
 import dataaccess.UserDAO;
 import exception.ResponseException;
 import model.AuthRecord;
+import model.LoginRequest;
 import model.UserRecord;
 
 public class Service {
@@ -30,6 +31,18 @@ public class Service {
 
         // Add and return Authentication Information
         return this.authDAO.createAuth(user.username());
+    }
+
+    // Login user and create authToken
+    public AuthRecord loginUser(LoginRequest login) throws ResponseException {
+
+        // Verify user with given credentials
+        UserRecord userRecord = this.userDAO.findUser(login.username());
+        if (userRecord == null || !userRecord.password().equals(login.password()))
+            throw new ResponseException("Error: unauthorized", 401);
+
+        // Create authToken and return
+        return this.authDAO.createAuth(login.username());
     }
 
     public void deleteDB() {
