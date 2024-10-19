@@ -10,6 +10,7 @@ import spark.*;
 
 import service.Service;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -29,6 +30,7 @@ public class Server {
 
         // Register your endpoints and handle exceptions here.
         Spark.get("/game", this::listGames);
+        Spark.put("/game", this::joinGame);
         Spark.post("/game", this::createGame);
         Spark.post("/user", this::registerUser);
         Spark.post("/session", this::loginUser);
@@ -47,6 +49,16 @@ public class Server {
     public void stop() {
         Spark.stop();
         Spark.awaitStop();
+    }
+
+    private Object joinGame(Request req, Response res) throws ResponseException {
+        record JoinRequest(String playerColor, int gameID){}
+
+        String authToken = req.headers("authorization");
+        JoinRequest joinRequest = new Gson().fromJson(req.body(), JoinRequest.class);
+
+        this.service.joinGame(authToken, joinRequest.playerColor(), joinRequest.gameID());
+        return "{}";
     }
 
     private Object loginUser(Request req, Response res) throws ResponseException {

@@ -59,6 +59,29 @@ public class Service {
         return user;
     }
 
+    public void joinGame(String authToken, String playerColor, int gameID) throws ResponseException {
+        AuthRecord user = this.verifyUser(authToken);
+
+        // Make sure Color is Correct
+        if (!playerColor.equals("BLACK") && !playerColor.equals("WHITE"))
+            throw new ResponseException("Error: bad request", 400);
+
+        // Make sure Game Exists
+        GameRecord game = this.gameDAO.findGame(gameID);
+        if (game == null) throw new ResponseException("Error: bad request", 400);
+
+        // Make sure color isn't taken
+        if (playerColor.equals("WHITE")) {
+            if (game.whiteUsername() != null) throw new ResponseException("Error: already taken", 403);
+
+        } else {
+            if (game.blackUsername() != null) throw new ResponseException("Error: already taken", 403);
+        }
+
+        // Join Game
+        this.gameDAO.joinGame(game, playerColor, user.username());
+    }
+
     public int createGame(String authToken, String gameName) throws ResponseException {
         this.verifyUser(authToken);
         // Make sure game doesn't already exist with name
