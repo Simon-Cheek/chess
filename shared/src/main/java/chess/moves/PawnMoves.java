@@ -67,7 +67,9 @@ public class PawnMoves {
         return moves;
     }
 
-    public static void promotionHelper(ChessBoard board, ChessPosition diagonalPos, ChessGame.TeamColor otherTeam, int promotionRow, ChessPiece.PieceType[] promotionPieces, ArrayList<ChessMove> moves, ChessPosition position) {
+    public static void promotionHelper(
+            ChessBoard board, ChessPosition diagonalPos, ChessGame.TeamColor otherTeam, int promotionRow,
+            ChessPiece.PieceType[] promotionPieces, ArrayList<ChessMove> moves, ChessPosition position) {
         ChessPiece targetPiece = board.getPiece(diagonalPos);
 
         if (targetPiece != null && targetPiece.getTeamColor() == otherTeam && diagonalPos.getRow() == promotionRow) {
