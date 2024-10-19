@@ -24,17 +24,18 @@ public class GameDAO {
     public int createGame(String name) {
         int id = counter;
         GameRecord game = new GameRecord(id, null, null, name, new ChessGame());
+        this.gameRecords.add(game);
         counter++;
         return id;
     }
 
     public void joinGame(GameRecord game, String color, String username) {
         if (color.equals("WHITE")) {
-            GameRecord newGame = new GameRecord(game.gameId(), username, game.blackUsername(), game.gameName(), game.game());
+            GameRecord newGame = new GameRecord(game.gameID(), username, game.blackUsername(), game.gameName(), game.game());
             this.gameRecords.remove(game);
             this.gameRecords.add(newGame);
         } else {
-            GameRecord newGame = new GameRecord(game.gameId(), game.whiteUsername(), username, game.gameName(), game.game());
+            GameRecord newGame = new GameRecord(game.gameID(), game.whiteUsername(), username, game.gameName(), game.game());
             this.gameRecords.remove(game);
             this.gameRecords.add(newGame);
         }
@@ -49,7 +50,7 @@ public class GameDAO {
 
     public GameRecord findGame(int gameID) {
         for (GameRecord game : gameRecords) {
-            if (game.gameId() == gameID) return game;
+            if (game.gameID() == gameID) return game;
         }
         return null;
     }

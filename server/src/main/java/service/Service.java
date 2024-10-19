@@ -63,7 +63,7 @@ public class Service {
         AuthRecord user = this.verifyUser(authToken);
 
         // Make sure Color is Correct
-        if (!playerColor.equals("BLACK") && !playerColor.equals("WHITE"))
+        if ( playerColor == null || (!playerColor.equals("BLACK") && !playerColor.equals("WHITE")))
             throw new ResponseException("Error: bad request", 400);
 
         // Make sure Game Exists
