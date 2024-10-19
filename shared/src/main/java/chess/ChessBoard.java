@@ -47,8 +47,8 @@ public class ChessBoard {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) return false;
-        if (!(obj instanceof ChessBoard)) return false;
+        if (obj == null) { return false; }
+        if (!(obj instanceof ChessBoard)) { return false; }
         ChessBoard other = (ChessBoard) obj;
 
         for (int i = 1; i < 9; i++) {
@@ -57,7 +57,7 @@ public class ChessBoard {
                 if (this.getPiece(current) == null) {
                     return other.getPiece(current) == null;
                 }
-                if (!(this.getPiece(current).equals(other.getPiece(current)))) return false;
+                if (!(this.getPiece(current).equals(other.getPiece(current)))) { return false; }
             }
         }
         return true;

@@ -55,12 +55,12 @@ public class ChessGame {
 
         // Get starting piece and color
         ChessPiece startPiece = this.board.getPiece(startPosition);
-        if (startPiece == null) return null;
+        if (startPiece == null) { return null; }
         TeamColor startColor = startPiece.getTeamColor();
 
         // Get List of possible moves
         Collection<ChessMove> moves = startPiece.pieceMoves(this.board, startPosition);
-        if (moves == null || moves.isEmpty()) return null;
+        if (moves == null || moves.isEmpty()) { return null; }
 
         // Initialize list of valid moves
         Collection<ChessMove> validMoves = new ArrayList<ChessMove>();
@@ -77,13 +77,13 @@ public class ChessGame {
             this.board.addPiece(move.getEndPosition(), startPiece);
             this.board.addPiece(move.getStartPosition(), null);
 
-            if (!isInCheck(startColor)) valid = true;
+            if (!isInCheck(startColor)) { valid = true; }
 
             // Roll back move
             this.board.addPiece(move.getStartPosition(), startPiece);
             this.board.addPiece(move.getEndPosition(), targetPiece);
 
-            if (valid) validMoves.add(move);
+            if (valid) { validMoves.add(move); }
         }
         return validMoves;
     }
@@ -98,11 +98,11 @@ public class ChessGame {
 
         Collection<ChessMove> validMoves = this.validMoves(move.getStartPosition());
 
-        if (validMoves == null || validMoves.isEmpty() || !validMoves.contains(move)) throw new InvalidMoveException("Not a valid move");
+        if (validMoves == null || validMoves.isEmpty() || !validMoves.contains(move)) { throw new InvalidMoveException("Not a valid move"); }
 
         ChessPiece startingPiece = this.board.getPiece(move.getStartPosition());
 
-        if (startingPiece.getTeamColor() != this.teamColor) throw new InvalidMoveException("Not a valid move");
+        if (startingPiece.getTeamColor() != this.teamColor) { throw new InvalidMoveException("Not a valid move"); }
 
         // Place starting position piece on top of end position
         this.board.addPiece(move.getEndPosition(), startingPiece);
@@ -123,7 +123,7 @@ public class ChessGame {
     private boolean isInDangerHelper(ChessPosition position, ChessPiece newPiece, ChessPosition newPosition) {
         Collection<ChessMove> moves = newPiece.pieceMoves(this.board, newPosition);
         for (ChessMove move : moves) {
-            if (move.getEndPosition().equals(position)) return true;
+            if (move.getEndPosition().equals(position)) { return true; }
         }
         return false;
     }
@@ -162,7 +162,6 @@ public class ChessGame {
 
                 if (newPiece != null && newPiece.getPieceType().equals(ChessPiece.PieceType.KING) &&
                         newPiece.getTeamColor().equals(teamColor)) {
-
                     return newPosition;
                 }
             }
@@ -178,7 +177,7 @@ public class ChessGame {
      */
     public boolean isInCheck(TeamColor teamColor) {
         ChessPosition kingPosition = findKing(teamColor);
-        if (kingPosition != null) return isInDanger(kingPosition);
+        if (kingPosition != null) { return isInDanger(kingPosition); }
         return false;
     }
 
@@ -195,7 +194,7 @@ public class ChessGame {
                 // Check every possible move by own color and make sure there is at least one valid move
                 if (newPiece != null && newPiece.getTeamColor() == teamColor) {
                     Collection<ChessMove> validPieceMoves = this.validMoves(newPosition);
-                    if (validPieceMoves != null) validMoves.addAll(validPieceMoves);
+                    if (validPieceMoves != null) { validMoves.addAll(validPieceMoves); }
                 }
             }
         }

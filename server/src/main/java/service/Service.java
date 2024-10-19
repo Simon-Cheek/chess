@@ -65,7 +65,7 @@ public class Service {
 
         // Make sure Color is Correct
         if ( playerColor == null || (!playerColor.equals(ChessGame.TeamColor.WHITE) && !playerColor.equals(ChessGame.TeamColor.BLACK)))
-            throw new ResponseException("Error: bad request", 400);
+        { throw new ResponseException("Error: bad request", 400); }
 
         // Make sure Game Exists
         GameRecord game = this.gameDAO.findGame(gameID);

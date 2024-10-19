@@ -22,7 +22,12 @@ public class ServiceTests {
         assertDoesNotThrow(() -> service.registerUser(newUser));
         AuthRecord auth = service.registerUser(newUser1);
         assertNotNull(auth.authToken());
+    }
 
+    @Test
+    @DisplayName("Registers users with complete information")
+    public void testRegisterUserNegative() throws ResponseException {
+        Service service = new Service();
         UserRecord incompleteUser = new UserRecord("testUser", "noEmail", null);
 
         // Registration forces a full user
@@ -35,12 +40,21 @@ public class ServiceTests {
         Service service = new Service();
         UserRecord newUser = new UserRecord("testUser", "testPass", "email@gmail");
         LoginRequest loginRequest = new LoginRequest("testUser", "testPass");
-        LoginRequest badLogin = new LoginRequest("idk", "notPassword");
 
         // Login Works and returns auth information
         AuthRecord auth = service.registerUser(newUser);
         assertDoesNotThrow(() -> service.loginUser(loginRequest));
         assertNotNull(service.loginUser(loginRequest).authToken());
+
+    }
+
+    @Test
+    @DisplayName("Does not allow bad logins")
+    public void testLoginNegative() throws ResponseException {
+        Service service = new Service();
+        UserRecord newUser = new UserRecord("testUser", "testPass", "email@gmail");
+        LoginRequest badLogin = new LoginRequest("idk", "notPassword");
+        AuthRecord auth = service.registerUser(newUser);
 
         // Login Does not Work if wrong user or password
         assertThrows(ResponseException.class, () -> service.loginUser(badLogin));
@@ -55,14 +69,36 @@ public class ServiceTests {
         // Logs out a user using authToken
         AuthRecord auth = service.registerUser(newUser);
         assertDoesNotThrow(() -> service.logoutUser(auth.authToken()));
-
-        // Can't log back in after logout
-        assertThrows(ResponseException.class, () -> service.verifyUser(auth.authToken()));
     }
 
     @Test
-    @DisplayName("Creates games when logged in")
+    @DisplayName("Doesn't let users perform auth actions after logout")
+    public void testLogoutNegative() throws ResponseException {
+        Service service = new Service();
+        UserRecord newUser = new UserRecord("testUser", "testPass", "email@gmail");
+
+        // Logs out a user using authToken
+        AuthRecord auth = service.registerUser(newUser);
+        service.logoutUser(auth.authToken());
+
+        assertThrows(ResponseException.class, () -> service.verifyUser(auth.authToken()));
+    }
+
+
+
+    @Test
+    @DisplayName("Creates games")
     public void testCreateGames() throws ResponseException {
+        Service service = new Service();
+        UserRecord newUser = new UserRecord("testUser", "testPass", "email@gmail");
+
+        AuthRecord auth = service.registerUser(newUser);
+        assertDoesNotThrow(() -> service.createGame(auth.authToken(), "GameName"));
+    }
+
+    @Test
+    @DisplayName("Creates games only when logged in")
+    public void testCreateGamesNegative() throws ResponseException {
         Service service = new Service();
         UserRecord newUser = new UserRecord("testUser", "testPass", "email@gmail");
 
@@ -75,7 +111,7 @@ public class ServiceTests {
     }
 
     @Test
-    @DisplayName("Lists Games when Logged In")
+    @DisplayName("Lists Games")
     public void testListGames() throws ResponseException {
         Service service = new Service();
         UserRecord newUser = new UserRecord("testUser", "testPass", "email@gmail");
@@ -86,6 +122,19 @@ public class ServiceTests {
         // Doesn't throw error and returns items when logged in
         assertDoesNotThrow(() -> service.listGames(auth.authToken()));
         assertNotNull(service.listGames(auth.authToken()).get(0));
+    }
+
+    @Test
+    @DisplayName("Lists Games only when Logged In")
+    public void testListGamesNegative() throws ResponseException {
+        Service service = new Service();
+        UserRecord newUser = new UserRecord("testUser", "testPass", "email@gmail");
+
+        AuthRecord auth = service.registerUser(newUser);
+        service.createGame(auth.authToken(), "GameName");
+
+        // Doesn't throw error and returns items when logged in
+        service.listGames(auth.authToken());
 
         assertThrows(ResponseException.class, () -> service.listGames("notAToken"));
     }
@@ -112,6 +161,18 @@ public class ServiceTests {
         AuthRecord auth = service.registerUser(newUser);
         int id = service.createGame(auth.authToken(), "GameName");
 
+        assertDoesNotThrow(() -> service.joinGame(auth.authToken(), ChessGame.TeamColor.WHITE, id));
+    }
+
+    @Test
+    @DisplayName("Joins Existing Games covering edge cases")
+    public void testJoinGamesNegative() throws ResponseException {
+        Service service = new Service();
+        UserRecord newUser = new UserRecord("testUser", "testPass", "email@gmail");
+
+        AuthRecord auth = service.registerUser(newUser);
+        int id = service.createGame(auth.authToken(), "GameName");
+
         // Can only join once
         assertDoesNotThrow(() -> service.joinGame(auth.authToken(), ChessGame.TeamColor.WHITE, id));
         assertThrows(ResponseException.class, () -> service.joinGame(auth.authToken(), ChessGame.TeamColor.WHITE, id));
@@ -122,10 +183,6 @@ public class ServiceTests {
         // Must join existing game
         assertThrows(ResponseException.class, () -> service.joinGame(auth.authToken(), ChessGame.TeamColor.BLACK, 75498254));
     }
-
-
-
-
 }
 
 
