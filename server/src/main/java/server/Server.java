@@ -43,10 +43,8 @@ public class Server {
     }
 
     private Object loginUser(Request req, Response res) throws ResponseException {
-        System.out.println("Starting the login process");
         LoginRequest login = new Gson().fromJson(req.body(), LoginRequest.class);
         AuthRecord auth = this.service.loginUser(login);
-        System.out.println("This should not be reached");
         return new Gson().toJson(auth);
     }
 

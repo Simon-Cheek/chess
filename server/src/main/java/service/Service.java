@@ -22,6 +22,10 @@ public class Service {
 
     public AuthRecord registerUser(UserRecord user) throws ResponseException {
 
+        // Make sure user is complete
+        if (user.password() == null || user.username() == null || user.email() == null)
+            throw new ResponseException("Error: bad request", 400);
+
         // Make sure user doesn't already exist
         UserRecord userRecord = this.userDAO.findUser(user.username());
         if (userRecord != null) throw new ResponseException("Error: already taken", 403);
