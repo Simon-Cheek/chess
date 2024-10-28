@@ -7,6 +7,7 @@ import model.AuthRecord;
 import model.GameRecord;
 import model.LoginRequest;
 import model.UserRecord;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.ArrayList;
 
@@ -44,8 +45,11 @@ public class Service {
 
         // Verify user with given credentials
         UserRecord userRecord = this.userDAO.findUser(login.username());
-        if (userRecord == null || !userRecord.password().equals(login.password()))
-        { throw new ResponseException("Error: unauthorized", 401); }
+
+        // Check hashed passwords
+        if (userRecord == null || !BCrypt.checkpw(login.password(), userRecord.password())) {
+            throw new ResponseException("Error: unauthorized", 401);
+        }
 
         // Create authToken and return
         return this.authDAO.createAuth(login.username());
