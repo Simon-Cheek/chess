@@ -2,6 +2,7 @@ package server;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
+import dataaccess.DataAccessException;
 import exception.ResponseException;
 import model.AuthRecord;
 import model.GameRecord;
@@ -96,7 +97,7 @@ public class Server {
         return new Gson().toJson(Map.of("games", games));
     }
 
-    private Object deleteAll(Request req, Response res) {
+    private Object deleteAll(Request req, Response res) throws ResponseException {
         res.status(200);
         this.service.deleteDB();
         return "{}";

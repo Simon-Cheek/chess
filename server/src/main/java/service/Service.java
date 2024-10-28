@@ -1,9 +1,7 @@
 package service;
 
 import chess.ChessGame;
-import dataaccess.AuthDAO;
-import dataaccess.GameDAO;
-import dataaccess.UserDAO;
+import dataaccess.*;
 import exception.ResponseException;
 import model.AuthRecord;
 import model.GameRecord;
@@ -14,12 +12,12 @@ import java.util.ArrayList;
 
 public class Service {
 
-    private AuthDAO authDAO;
+    private DBAuthDAO authDAO;
     private GameDAO gameDAO;
     private UserDAO userDAO;
 
     public Service() {
-        this.authDAO = new AuthDAO();
+        this.authDAO = new DBAuthDAO();
         this.gameDAO = new GameDAO();
         this.userDAO = new UserDAO();
     }
@@ -104,7 +102,7 @@ public class Service {
         return this.gameDAO.getAllGames();
     }
 
-    public void deleteDB() {
+    public void deleteDB() throws ResponseException {
         this.authDAO.deleteAuths();
         this.gameDAO.deleteGames();
         this.userDAO.deleteUsers();

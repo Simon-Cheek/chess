@@ -4,17 +4,16 @@ import exception.ResponseException;
 import model.AuthRecord;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.UUID;
 
 public class DBAuthDAO {
 
-    public DBAuthDAO() throws ResponseException, DataAccessException {
+    public DBAuthDAO() {
         configureAuthDB();
     }
 
     // Creates Auth for a user and adds to the DB
-    public AuthRecord createAuth(String username) throws DataAccessException, ResponseException {
+    public AuthRecord createAuth(String username) throws ResponseException {
         String token = UUID.randomUUID().toString();
         AuthRecord auth = new AuthRecord(token, username);
         String statement = "INSERT INTO authData (user, authToken) VALUES (?, ?)";
@@ -77,14 +76,16 @@ public class DBAuthDAO {
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
             """;
 
-    private void configureAuthDB() throws ResponseException, DataAccessException {
-        DatabaseManager.createDatabase();
-        try (Connection conn = DatabaseManager.getConnection()) {
-                try (var preparedStatement = conn.prepareStatement(setup)) {
-                    preparedStatement.executeUpdate();
+    private void configureAuthDB() {
+        try {
+            DatabaseManager.createDatabase();
+                try (Connection conn = DatabaseManager.getConnection()) {
+                    try (var preparedStatement = conn.prepareStatement(setup)) {
+                        preparedStatement.executeUpdate();
                 }
-        } catch(SQLException ex) {
-            throw new ResponseException(String.format("Database Config Error: %s", ex.getMessage()), 500);
+            }
+        } catch(Exception ex) {
+            throw new RuntimeException();
         }
     }
 }
