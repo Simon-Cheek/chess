@@ -17,24 +17,8 @@ public class DBAuthDAO {
         String token = UUID.randomUUID().toString();
         AuthRecord auth = new AuthRecord(token, username);
         String statement = "INSERT INTO authData (user, authToken) VALUES (?, ?)";
-        executeUpdate(statement, auth.username(), auth.authToken());
+        ExecuteUpdate.executeUpdate(statement, auth.username(), auth.authToken());
         return auth;
-    }
-
-    private void executeUpdate(String statement, Object... params) throws ResponseException {
-        try (var conn = DatabaseManager.getConnection()) {
-            try (var ps = conn.prepareStatement(statement)) {
-                for (var i = 0; i < params.length; i++) {
-
-                    // Only working with Strings in AuthDAO
-                    var param = params[i];
-                    ps.setString(i + 1, (String)param);
-                }
-                ps.executeUpdate();
-            }
-        } catch(Exception ex) {
-            throw new ResponseException(String.format("Database Update Error: %s", ex.getMessage()), 500);
-        }
     }
 
         public AuthRecord getAuthByToken(String authToken) throws ResponseException {
@@ -58,13 +42,13 @@ public class DBAuthDAO {
 
     public void deleteAuthByToken(String authToken) throws ResponseException {
         String statement = "DELETE FROM authData WHERE authToken=?";
-        executeUpdate(statement, authToken);
+        ExecuteUpdate.executeUpdate(statement, authToken);
     }
 
     // Clear the Database
     public void deleteAuths() throws ResponseException {
         String statement = "TRUNCATE authData";
-        executeUpdate(statement);
+        ExecuteUpdate.executeUpdate(statement);
     }
 
     private final String setup = """
