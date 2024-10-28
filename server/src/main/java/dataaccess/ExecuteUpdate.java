@@ -2,21 +2,30 @@ package dataaccess;
 
 import exception.ResponseException;
 
+import java.sql.ResultSet;
+import java.sql.Statement;
+
+import static java.sql.Types.NULL;
+
 public class ExecuteUpdate {
 
-    public static void executeUpdate(String statement, Object... params) throws ResponseException {
+    public static int executeUpdate(String statement, Object... params) throws ResponseException {
         try (var conn = DatabaseManager.getConnection()) {
-            try (var ps = conn.prepareStatement(statement)) {
+            try (var ps = conn.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS)) {
                 for (var i = 0; i < params.length; i++) {
 
-                    // Only working with Strings in AuthDAO
                     var param = params[i];
-                    ps.setString(i + 1, (String)param);
+                    if (param instanceof String p) {ps.setString(i + 1, p); }
+                    else if (param instanceof Integer p) {ps.setInt(i + 1, p); }
+                    else if (param == null) {ps.setNull(i + 1, NULL);}
                 }
                 ps.executeUpdate();
+                ResultSet rs = ps.getGeneratedKeys();
+                if (rs.next()) { return rs.getInt(1); }
             }
         } catch(Exception ex) {
             throw new ResponseException(String.format("Database Update Error: %s", ex.getMessage()), 500);
         }
+        return 0;
     }
 }

@@ -22,6 +22,8 @@ public class ServiceTests {
         assertDoesNotThrow(() -> service.registerUser(newUser));
         AuthRecord auth = service.registerUser(newUser1);
         assertNotNull(auth.authToken());
+
+        service.deleteDB();
     }
 
     @Test
@@ -32,6 +34,8 @@ public class ServiceTests {
 
         // Registration forces a full user
         assertThrows(ResponseException.class, () -> service.registerUser(incompleteUser));
+
+        service.deleteDB();
     }
 
     @Test
@@ -46,6 +50,8 @@ public class ServiceTests {
         assertDoesNotThrow(() -> service.loginUser(loginRequest));
         assertNotNull(service.loginUser(loginRequest).authToken());
 
+        service.deleteDB();
+
     }
 
     @Test
@@ -58,6 +64,8 @@ public class ServiceTests {
 
         // Login Does not Work if wrong user or password
         assertThrows(ResponseException.class, () -> service.loginUser(badLogin));
+
+        service.deleteDB();
     }
 
     @Test
@@ -69,6 +77,8 @@ public class ServiceTests {
         // Logs out a user using authToken
         AuthRecord auth = service.registerUser(newUser);
         assertDoesNotThrow(() -> service.logoutUser(auth.authToken()));
+
+        service.deleteDB();
     }
 
     @Test
@@ -82,6 +92,8 @@ public class ServiceTests {
         service.logoutUser(auth.authToken());
 
         assertThrows(ResponseException.class, () -> service.verifyUser(auth.authToken()));
+
+        service.deleteDB();
     }
 
 
@@ -94,6 +106,7 @@ public class ServiceTests {
 
         AuthRecord auth = service.registerUser(newUser);
         assertDoesNotThrow(() -> service.createGame(auth.authToken(), "GameName"));
+        service.deleteDB();
     }
 
     @Test
@@ -108,6 +121,7 @@ public class ServiceTests {
         // Cannot create a game when name in use or when not logged in
         assertThrows(ResponseException.class, () -> service.createGame(auth.authToken(), "GameName"));
         assertThrows(ResponseException.class, () -> service.createGame("notAToken", "GameName1"));
+        service.deleteDB();
     }
 
     @Test
@@ -122,6 +136,7 @@ public class ServiceTests {
         // Doesn't throw error and returns items when logged in
         assertDoesNotThrow(() -> service.listGames(auth.authToken()));
         assertNotNull(service.listGames(auth.authToken()).get(0));
+        service.deleteDB();
     }
 
     @Test
@@ -137,6 +152,7 @@ public class ServiceTests {
         service.listGames(auth.authToken());
 
         assertThrows(ResponseException.class, () -> service.listGames("notAToken"));
+        service.deleteDB();
     }
 
     @Test
@@ -151,7 +167,7 @@ public class ServiceTests {
     }
 
     @Test
-    @DisplayName("Can't clear DB without auth")
+    @DisplayName("Can't do anything without auth")
     public void testClearDBNegative() throws ResponseException {
         Service service = new Service();
         UserRecord newUser = new UserRecord("testUser", "testPass", "email@gmail");
@@ -162,6 +178,7 @@ public class ServiceTests {
         // Can't query games once db is gone
         assertDoesNotThrow(service::deleteDB);
         assertThrows(ResponseException.class, () -> service.listGames(auth.authToken()));
+        service.deleteDB();
     }
     @Test
     @DisplayName("Joins Existing Games")
@@ -173,6 +190,7 @@ public class ServiceTests {
         int id = service.createGame(auth.authToken(), "GameName");
 
         assertDoesNotThrow(() -> service.joinGame(auth.authToken(), ChessGame.TeamColor.WHITE, id));
+        service.deleteDB();
     }
 
     @Test
@@ -193,6 +211,8 @@ public class ServiceTests {
 
         // Must join existing game
         assertThrows(ResponseException.class, () -> service.joinGame(auth.authToken(), ChessGame.TeamColor.BLACK, 75498254));
+
+        service.deleteDB();
     }
 }
 
