@@ -39,11 +39,17 @@ public class DBGameDAO {
     }
 
     public GameRecord findGame(String name) throws ResponseException {
-        return ExecuteUpdate.executeGameQuery("SELECT id, whiteUsername, blackUsername, game FROM gameData WHERE gameName = ?", name);
+        return ExecuteUpdate.executeGameQuery("SELECT id, whiteUsername, blackUsername, gameName, game FROM gameData WHERE gameName = ?", name);
     }
 
     public GameRecord findGame(int gameId) throws ResponseException {
         return ExecuteUpdate.executeGameQuery("SELECT id, whiteUsername, blackUsername, gameName, game FROM gameData WHERE id = ?", gameId);
+    }
+
+    public void persistGame(GameRecord game) throws ResponseException {
+        int gameId = game.gameID();
+        String statement = "UPDATE gameData SET game = ? WHERE id = ?";
+        ExecuteUpdate.executeUpdate(statement, new Gson().toJson(game.game()), gameId);
     }
 
 
