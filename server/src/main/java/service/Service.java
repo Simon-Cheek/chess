@@ -14,12 +14,12 @@ import java.util.ArrayList;
 public class Service {
 
     private DBAuthDAO authDAO;
-    private GameDAO gameDAO;
+    private DBGameDAO gameDAO;
     private DBUserDAO userDAO;
 
     public Service() {
         this.authDAO = new DBAuthDAO();
-        this.gameDAO = new GameDAO();
+        this.gameDAO = new DBGameDAO();
         this.userDAO = new DBUserDAO();
     }
 

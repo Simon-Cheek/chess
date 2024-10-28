@@ -4,6 +4,7 @@ import chess.ChessGame;
 import com.google.gson.Gson;
 import exception.ResponseException;
 import model.GameRecord;
+import model.UserRecord;
 
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -37,22 +38,36 @@ public class DBGameDAO {
         }
     }
 
-    public GameRecord findGame(String name) {
-        for (GameRecord game : gameRecords) {
-            if (game.gameName().equals(name)) { return game; }
-        }
-        return null;
+    public GameRecord findGame(String name) throws ResponseException {
+        return ExecuteUpdate.executeGameQuery("SELECT id, whiteUsername, blackUsername, game FROM gameData WHERE gameName = ?", name);
     }
 
-    public GameRecord findGame(int gameID) {
-        for (GameRecord game : gameRecords) {
-            if (game.gameID() == gameID) { return game; }
-        }
-        return null;
+    public GameRecord findGame(int gameId) throws ResponseException {
+        return ExecuteUpdate.executeGameQuery("SELECT whiteUsername, blackUsername, gameName, game FROM gameData WHERE id = ?", gameId);
     }
 
-    public ArrayList<GameRecord> getAllGames() {
-        return this.gameRecords;
+
+    public ArrayList<GameRecord> getAllGames() throws ResponseException {
+        ArrayList<GameRecord> allGames = new ArrayList<GameRecord>();
+        try (var conn = DatabaseManager.getConnection()) {
+            String statement = "SELECT * from gameData";
+            try (var ps = conn.prepareStatement(statement)) {
+                try (var rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        int gameId = rs.getInt("id");
+                        String whiteUsername = rs.getString("whiteUsername");
+                        String blackUsername = rs.getString("blackUsername");
+                        String name = rs.getString("gameName");
+                        String gameString = rs.getString("game");
+                        ChessGame game = new Gson().fromJson(gameString, ChessGame.class);
+                        allGames.add(new GameRecord(gameId, whiteUsername, blackUsername, name, game));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new ResponseException(String.format("Unable to read data: %s", e.getMessage()), 500);
+        }
+        return allGames;
     }
 
     private final String setup = """
@@ -61,7 +76,7 @@ public class DBGameDAO {
             `whiteUsername` varchar(256) DEFAULT NULL,
             `blackUsername` varchar(256) DEFAULT NULL,
             `gameName` varchar(256) NOT NULL,
-            `game` TEXT NOT NULL
+            `game` TEXT NOT NULL,
             PRIMARY KEY (`id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
             """;
@@ -78,5 +93,4 @@ public class DBGameDAO {
             throw new RuntimeException();
         }
     }
-
 }
