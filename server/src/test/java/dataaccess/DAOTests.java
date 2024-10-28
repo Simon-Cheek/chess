@@ -216,5 +216,61 @@ public class DAOTests {
 
     }
 
+    @Test
+    @DisplayName("User - Creates Table Upon Initialization")
+    public void testCreateUserDAODB() throws ResponseException {
+        assertDoesNotThrow(DBUserDAO::new);
+    }
 
+    @Test
+    @DisplayName("User - Creates A New User")
+    public void testCreateUserDB() throws ResponseException {
+        DBUserDAO userDAO = new DBUserDAO();
+        UserRecord newUser = new UserRecord("testUser", "password", "email");
+        assertDoesNotThrow(() -> userDAO.createUser(newUser));
+    }
+
+    @Test
+    @DisplayName("User - Doesn't Create Invalid User")
+    public void testCreateInvalidUserDB() throws ResponseException {
+        DBUserDAO userDAO = new DBUserDAO();
+        UserRecord newUser = new UserRecord("testUser", "password", null);
+        assertThrows(ResponseException.class, () -> userDAO.createUser(newUser));
+    }
+
+    @Test
+    @DisplayName("User - Deletes All User")
+    public void testDeleteUsersDB() throws ResponseException {
+        DBUserDAO userDAO = new DBUserDAO();
+        UserRecord newUser = new UserRecord("testUser1", "password", "testEmail");
+        userDAO.createUser(newUser);
+
+        userDAO.deleteUsers();
+
+        assertNull(userDAO.findUser("testUser1"));
+    }
+
+    @Test
+    @DisplayName("User - Finds Users")
+    public void testFindUserDB() throws ResponseException {
+        DBUserDAO userDAO = new DBUserDAO();
+        userDAO.deleteUsers();
+
+        UserRecord newUser = new UserRecord("testUser1", "password", "testEmail");
+        userDAO.createUser(newUser);
+
+        assertNotNull(userDAO.findUser("testUser1"));
+    }
+
+    @Test
+    @DisplayName("User - Doesn't Find Invalid Users")
+    public void testFindInvalidUserDB() throws ResponseException {
+        DBUserDAO userDAO = new DBUserDAO();
+        userDAO.deleteUsers();
+
+        UserRecord newUser = new UserRecord("testUser1", "password", "testEmail");
+        userDAO.createUser(newUser);
+
+        assertNull(userDAO.findUser("testUser2"));
+    }
 }
