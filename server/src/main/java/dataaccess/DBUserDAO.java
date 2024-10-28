@@ -2,9 +2,9 @@ package dataaccess;
 
 import exception.ResponseException;
 import model.UserRecord;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.Connection;
-import java.util.ArrayList;
 
 public class DBUserDAO {
 
@@ -13,17 +13,31 @@ public class DBUserDAO {
     }
 
     // Returns UserRecord object that matches given username
-    public UserRecord findUser(String username) {
-        for (UserRecord user : this.userRecords) {
-            if (user.username().equals(username)) { return user; }
+    public UserRecord findUser(String username) throws ResponseException {
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT username, password, email FROM userData WHERE username=?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setString(1, username);
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        String user = rs.getString("username");
+                        String pass = rs.getString("password");
+                        String email = rs.getString("email");
+                        return new UserRecord(user, pass, email);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new ResponseException(String.format("Unable to read data: %s", e.getMessage()), 500);
         }
         return null;
     }
 
-    // Creates a new user
+    // Creates a new user with HASHED password
     public void createUser(UserRecord user) throws ResponseException {
         String statement = "INSERT INTO userData (username, password, email) VALUES (?, ?, ?)";
-        ExecuteUpdate.executeUpdate(statement, user.username(), user.password(),user.email());
+        String hashedPassword = BCrypt.hashpw(user.password(), BCrypt.gensalt());
+        ExecuteUpdate.executeUpdate(statement, user.username(), hashedPassword,user.email());
     }
 
     public void deleteUsers() throws ResponseException {
@@ -54,5 +68,4 @@ public class DBUserDAO {
             throw new RuntimeException();
         }
     }
-
 }

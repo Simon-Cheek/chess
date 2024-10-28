@@ -14,12 +14,12 @@ public class Service {
 
     private DBAuthDAO authDAO;
     private GameDAO gameDAO;
-    private UserDAO userDAO;
+    private DBUserDAO userDAO;
 
     public Service() {
         this.authDAO = new DBAuthDAO();
         this.gameDAO = new GameDAO();
-        this.userDAO = new UserDAO();
+        this.userDAO = new DBUserDAO();
     }
 
     public AuthRecord registerUser(UserRecord user) throws ResponseException {
