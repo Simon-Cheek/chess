@@ -43,7 +43,7 @@ public class DBGameDAO {
     }
 
     public GameRecord findGame(int gameId) throws ResponseException {
-        return ExecuteUpdate.executeGameQuery("SELECT whiteUsername, blackUsername, gameName, game FROM gameData WHERE id = ?", gameId);
+        return ExecuteUpdate.executeGameQuery("SELECT id, whiteUsername, blackUsername, gameName, game FROM gameData WHERE id = ?", gameId);
     }
 
 
