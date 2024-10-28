@@ -61,15 +61,6 @@ public class DBAuthDAO {
             """;
 
     private void configureAuthDB() {
-        try {
-            DatabaseManager.createDatabase();
-                try (Connection conn = DatabaseManager.getConnection()) {
-                    try (var preparedStatement = conn.prepareStatement(setup)) {
-                        preparedStatement.executeUpdate();
-                }
-            }
-        } catch(Exception ex) {
-            throw new RuntimeException();
-        }
+        ExecuteUpdate.configureDB(setup);
     }
 }

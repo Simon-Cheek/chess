@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import exception.ResponseException;
 import model.GameRecord;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
@@ -53,5 +54,18 @@ public class ExecuteUpdate {
             throw new ResponseException(String.format("Unable to read data: %s", e.getMessage()), 500);
         }
         return null;
+    }
+
+    public static void configureDB(String statement) {
+        try {
+            DatabaseManager.createDatabase();
+            try (Connection conn = DatabaseManager.getConnection()) {
+                try (var preparedStatement = conn.prepareStatement(statement)) {
+                    preparedStatement.executeUpdate();
+                }
+            }
+        } catch(Exception ex) {
+            throw new RuntimeException();
+        }
     }
 }

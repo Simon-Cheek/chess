@@ -57,15 +57,6 @@ public class DBUserDAO {
             """;
 
     private void configureUserDB() {
-        try {
-            DatabaseManager.createDatabase();
-            try (Connection conn = DatabaseManager.getConnection()) {
-                try (var preparedStatement = conn.prepareStatement(setup)) {
-                    preparedStatement.executeUpdate();
-                }
-            }
-        } catch(Exception ex) {
-            throw new RuntimeException();
-        }
+        ExecuteUpdate.configureDB(setup);
     }
 }
