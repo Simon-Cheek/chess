@@ -1,51 +1,73 @@
 import com.google.gson.Gson;
 import model.AuthRecord;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Map;
 
 public class ServerFacade {
 
     private final String baseUrl = "http://localhost:8080";
 
-    private InputStreamReader makeRequest(HttpURLConnection http, Object body) {
+    private <T> ResponseObject makeRequest(HttpURLConnection http, Object body, Class<T> returnType) {
         try {
             if (body != null) {
-                var outputStream = http.getOutputStream();
-                var jsonBody = new Gson().toJson(body);
-                outputStream.write(jsonBody.getBytes());
+               try (var outputStream = http.getOutputStream()) {
+                    var jsonBody = new Gson().toJson(body);
+                    outputStream.write(jsonBody.getBytes());
+               }
+            }
+            http.connect();
+
+            if (http.getResponseCode() >= 400) {
+                return new ResponseObject(http.getResponseCode(), null);
             }
 
-            http.connect();
-            InputStream resBody = http.getInputStream();
-            return new InputStreamReader(resBody);
+            try (InputStream resBody = http.getInputStream()) {
+                InputStreamReader inputStreamReader = new InputStreamReader(resBody);
+                return new ResponseObject(http.getResponseCode(), new Gson().fromJson(inputStreamReader, returnType));
+            }
 
-        } catch (Exception e) {throw new RuntimeException("Invalid Connection");
+        } catch (Exception e) {
+            System.out.println(e);
+            throw new RuntimeException("Invalid Connection");
         }
     }
 
-    public AuthRecord loginUser(String username, String password) {
+    public ResponseObject registerUser(String username, String password, String email) {
+        try {
+            URI uri = new URI(this.baseUrl + "/user");
+            HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
+            http.setRequestMethod("POST");
+            http.setDoOutput(true);
+            http.addRequestProperty("Content-Type", "application/json");
+
+            Map<String, String> body = Map.of("username", username, "password", password, "email", email);
+
+            return this.makeRequest(http, body, AuthRecord.class);
+
+        } catch (Exception e) {
+            System.out.println(e);
+            throw new RuntimeException("Invalid Request");
+        }
+    }
+
+    public ResponseObject loginUser(String username, String password) {
         try {
         URI uri = new URI(this.baseUrl + "/session");
         HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
-        http.setRequestMethod("GET");
+        http.setRequestMethod("POST");
         http.setDoOutput(true);
         http.addRequestProperty("Content-Type", "application/json");
 
         Map<String, String> body = Map.of("username", username, "password", password);
 
-        InputStreamReader inputStreamReader = this.makeRequest(http, body);
-        return new Gson().fromJson(inputStreamReader, AuthRecord.class);
+        return this.makeRequest(http, body, AuthRecord.class);
 
          } catch (Exception e) {
             throw new RuntimeException("Invalid Request");
         }
     }
-
 }
