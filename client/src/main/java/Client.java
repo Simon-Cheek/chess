@@ -21,10 +21,28 @@ public class Client {
         String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
         return switch (cmd) {
             case "register" -> this.register(params);
-            case "login" -> "login";
+            case "login" -> this.login(params);
             case "quit" -> "quit";
             default -> this.help();
         };
+    }
+
+    public String login(String[] params) {
+        if (params.length != 2) {
+            throw new RuntimeException("Invalid Argument Length");
+        } else if (this.isLoggedIn()) {
+            throw new RuntimeException("Error: Already Logged In");
+        } else {
+            ResponseObject res = serverFacade.loginUser(params[0], params[1]);
+            if (res.statusCode() == 200) {
+                return this.setLogin(res);
+            }
+            switch (res.statusCode()) {
+                case 400 -> throw new RuntimeException("Bad Request");
+                case 401 -> throw new RuntimeException("Unauthorized");
+                default -> throw new RuntimeException("Server Error");
+            }
+        }
     }
 
     public String register(String[] params) {
@@ -33,20 +51,15 @@ public class Client {
         } else if (this.isLoggedIn()) {
             throw new RuntimeException("Error: Already Logged In");
         } else {
-
             ResponseObject res = serverFacade.registerUser(params[0], params[1], params[2]);
             if (res.statusCode() == 200) {
-                AuthRecord auth = (AuthRecord) res.data();
-                this.authToken = auth.authToken();
-                this.username = auth.username();
-                return "Logged in as " + this.username;
+                return this.setLogin(res);
             }
-            return switch (res.statusCode()) {
-                case 400 -> "Bad Request";
-                case 403 -> "Username Already Taken";
-                default -> "Server Error";
-            };
-
+            switch (res.statusCode()) {
+                case 400 -> throw new RuntimeException("Bad Request");
+                case 403 -> throw new RuntimeException("Username Already Taken");
+                default -> throw new RuntimeException("Server Error");
+            }
         }
     }
 
@@ -72,5 +85,10 @@ public class Client {
         return !this.username.isEmpty();
     }
 
-
+    private String setLogin(ResponseObject res) {
+        AuthRecord auth = (AuthRecord) res.data();
+        this.authToken = auth.authToken();
+        this.username = auth.username();
+        return "Logged in as " + this.username;
+    }
 }

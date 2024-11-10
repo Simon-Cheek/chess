@@ -24,15 +24,29 @@ public class ServerFacade {
             if (http.getResponseCode() >= 400) {
                 return new ResponseObject(http.getResponseCode(), null);
             }
-
-            try (InputStream resBody = http.getInputStream()) {
-                InputStreamReader inputStreamReader = new InputStreamReader(resBody);
-                return new ResponseObject(http.getResponseCode(), new Gson().fromJson(inputStreamReader, returnType));
-            }
+            if (returnType != null) {
+                try (InputStream resBody = http.getInputStream()) {
+                    InputStreamReader inputStreamReader = new InputStreamReader(resBody);
+                    return new ResponseObject(http.getResponseCode(), new Gson().fromJson(inputStreamReader, returnType));
+                }
+            } else return new ResponseObject(http.getResponseCode(), null);
 
         } catch (Exception e) {
             throw new RuntimeException("Invalid Connection");
         }
+    }
+
+    public ResponseObject logoutUser(String authToken) {
+        try {
+            URI uri = new URI(this.baseUrl + "/session");
+            HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
+            http.setRequestMethod("DELETE");
+            http.setRequestProperty("Authorization", authToken);
+            return this.makeRequest(http, null, null);
+        } catch (Exception e) {
+            throw new RuntimeException("Invalid Request");
+        }
+
     }
 
     public ResponseObject registerUser(String username, String password, String email) {
