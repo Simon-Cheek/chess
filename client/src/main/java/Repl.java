@@ -1,3 +1,5 @@
+import ui.EscapeSequences;
+
 import java.util.Scanner;
 
 public class Repl {
@@ -18,7 +20,7 @@ public class Repl {
             String line = scanner.nextLine();
             try {
                 result = this.client.parse(line);
-                System.out.print("Result:" + result);
+                System.out.print("RESULT: " + result);
             } catch (Exception e) {
                 this.printError();
             }
@@ -27,8 +29,11 @@ public class Repl {
     }
 
     private void printPrompt() {
+        System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
         System.out.print(client.getLoggedIn() ? "[LOGGED IN]" : "[LOGGED OUT]");
         System.out.print(" >>> ");
+        System.out.print(EscapeSequences.RESET_BG_COLOR);
+        System.out.print(" ");
     }
 
     private void printError() {
