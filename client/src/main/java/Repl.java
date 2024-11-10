@@ -20,9 +20,9 @@ public class Repl {
             String line = scanner.nextLine();
             try {
                 result = this.client.parse(line);
-                System.out.print("RESULT: " + result);
+                System.out.print(result);
             } catch (Exception e) {
-                this.printError();
+                this.printError(e);
             }
             System.out.println();
         }
@@ -30,14 +30,14 @@ public class Repl {
 
     private void printPrompt() {
         System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
-        System.out.print(client.getLoggedIn() ? "[LOGGED IN]" : "[LOGGED OUT]");
+        System.out.print(client.isLoggedIn() ? "[LOGGED IN]" : "[LOGGED OUT]");
         System.out.print(" >>> ");
         System.out.print(EscapeSequences.RESET_BG_COLOR);
         System.out.print(" ");
     }
 
-    private void printError() {
-        System.out.println("Error: Invalid Prompt");
+    private void printError(Exception e) {
+        System.out.println(EscapeSequences.SET_BG_COLOR_RED + "Error: " + e.getMessage() + EscapeSequences.RESET_BG_COLOR);
     }
 
 }

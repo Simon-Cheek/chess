@@ -31,7 +31,6 @@ public class ServerFacade {
             }
 
         } catch (Exception e) {
-            System.out.println(e);
             throw new RuntimeException("Invalid Connection");
         }
     }
@@ -49,7 +48,6 @@ public class ServerFacade {
             return this.makeRequest(http, body, AuthRecord.class);
 
         } catch (Exception e) {
-            System.out.println(e);
             throw new RuntimeException("Invalid Request");
         }
     }
