@@ -23,8 +23,16 @@ public class Client {
             case "register" -> this.register(params);
             case "login" -> this.login(params);
             case "quit" -> "quit";
+            case "logout" -> this.logout();
             default -> this.help();
         };
+    }
+
+    public String logout() {
+        String res = AuthClient.logout(this.serverFacade, this.authToken);
+        this.authToken = "";
+        this.username = "";
+        return res;
     }
 
     public String login(String[] params) {
