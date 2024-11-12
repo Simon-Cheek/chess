@@ -19,11 +19,14 @@ public class ServerFacadeTests {
     private static Server server;
     private static Service service;
 
+    private static int serverPort;
+
     @BeforeAll
     public static void init() {
         server = new Server();
         service = new Service();
-        var port = server.run(8080);
+        var port = server.run(0);
+        serverPort = port;
         System.out.println("Started test HTTP server on " + port);
     }
 
@@ -37,7 +40,7 @@ public class ServerFacadeTests {
     public void registerUserPositive() throws ResponseException {
         service.deleteDB();
 
-        ServerFacade facade = new ServerFacade();
+        ServerFacade facade = new ServerFacade(serverPort);
         ResponseObject res = facade.registerUser("testyhehe", "testytest", "hehehe");
         AuthRecord auth = (AuthRecord) res.data();
         Assertions.assertNotNull(auth);
@@ -47,7 +50,7 @@ public class ServerFacadeTests {
     @Test
     public void registerUserNegative() throws ResponseException {
         service.deleteDB();
-        ServerFacade facade = new ServerFacade();
+        ServerFacade facade = new ServerFacade(serverPort);
         Assertions.assertThrows(
                 RuntimeException.class, () -> facade.registerUser(null, null, null));
 
@@ -57,7 +60,7 @@ public class ServerFacadeTests {
     public void loginUserPositive() throws ResponseException {
         service.deleteDB();
 
-        ServerFacade facade = new ServerFacade();
+        ServerFacade facade = new ServerFacade(serverPort);
         facade.registerUser("testyhehe", "testytest", "hehehe");
         ResponseObject res = facade.loginUser("testyhehe", "testytest");
         AuthRecord auth = (AuthRecord) res.data();
@@ -68,7 +71,7 @@ public class ServerFacadeTests {
     @Test
     public void loginUserNegative() throws ResponseException {
         service.deleteDB();
-        ServerFacade facade = new ServerFacade();
+        ServerFacade facade = new ServerFacade(serverPort);
         facade.registerUser("username", "password", "email");
         ResponseObject res = facade.loginUser("username", "wrongPassword");
         Assertions.assertEquals(401, res.statusCode());
@@ -77,7 +80,7 @@ public class ServerFacadeTests {
     @Test
     public void logoutUserPositive() throws ResponseException {
         service.deleteDB();
-        ServerFacade facade = new ServerFacade();
+        ServerFacade facade = new ServerFacade(serverPort);
         ResponseObject res = facade.registerUser("testyhehe", "testytest", "hehehe");
         AuthRecord auth = (AuthRecord) res.data();
         ResponseObject logoutRes = facade.logoutUser(auth.authToken());
@@ -87,7 +90,7 @@ public class ServerFacadeTests {
     @Test
     public void logoutUserNegative() throws ResponseException {
         service.deleteDB();
-        ServerFacade facade = new ServerFacade();
+        ServerFacade facade = new ServerFacade(serverPort);
         facade.registerUser("username", "password", "email");
         ResponseObject res = facade.logoutUser("wrongToken");
         Assertions.assertEquals(401, res.statusCode());
@@ -96,7 +99,7 @@ public class ServerFacadeTests {
     @Test
     public void createGamePositive() throws ResponseException {
         service.deleteDB();
-        ServerFacade facade = new ServerFacade();
+        ServerFacade facade = new ServerFacade(serverPort);
         ResponseObject res = facade.registerUser("testyhehe", "testytest", "hehehe");
         AuthRecord auth = (AuthRecord) res.data();
         ResponseObject createRes = facade.createGame(auth.authToken(), "gameName");
@@ -107,7 +110,7 @@ public class ServerFacadeTests {
     @Test
     public void createGameNegative() throws ResponseException {
         service.deleteDB();
-        ServerFacade facade = new ServerFacade();
+        ServerFacade facade = new ServerFacade(serverPort);
         ResponseObject res = facade.registerUser("testyhehe", "testytest", "hehehe");
         AuthRecord auth = (AuthRecord) res.data();
         facade.createGame(auth.authToken(), "gameName");
@@ -118,7 +121,7 @@ public class ServerFacadeTests {
     @Test
     public void listGamesPositive() throws ResponseException {
         service.deleteDB();
-        ServerFacade facade = new ServerFacade();
+        ServerFacade facade = new ServerFacade(serverPort);
         ResponseObject res = facade.registerUser("testyhehe", "testytest", "hehehe");
         AuthRecord auth = (AuthRecord) res.data();
         facade.createGame(auth.authToken(), "gameName");
@@ -131,7 +134,7 @@ public class ServerFacadeTests {
     @Test
     public void listGamesNegative() throws ResponseException {
         service.deleteDB();
-        ServerFacade facade = new ServerFacade();
+        ServerFacade facade = new ServerFacade(serverPort);
         ResponseObject res = facade.registerUser("testyhehe", "testytest", "hehehe");
         AuthRecord auth = (AuthRecord) res.data();
         facade.createGame(auth.authToken(), "gameName");
@@ -142,7 +145,7 @@ public class ServerFacadeTests {
     @Test
     public void joinGamePositive() throws ResponseException {
         service.deleteDB();
-        ServerFacade facade = new ServerFacade();
+        ServerFacade facade = new ServerFacade(serverPort);
         ResponseObject res = facade.registerUser("testyhehe", "testytest", "hehehe");
         AuthRecord auth = (AuthRecord) res.data();
         ResponseObject createRes = facade.createGame(auth.authToken(), "gameName");
@@ -155,7 +158,7 @@ public class ServerFacadeTests {
     @Test
     public void joinGameNegative() throws ResponseException {
         service.deleteDB();
-        ServerFacade facade = new ServerFacade();
+        ServerFacade facade = new ServerFacade(serverPort);
         ResponseObject res = facade.registerUser("testyhehe", "testytest", "hehehe");
         AuthRecord auth = (AuthRecord) res.data();
         ResponseObject createRes = facade.createGame(auth.authToken(), "gameName");

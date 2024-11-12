@@ -15,7 +15,18 @@ import java.util.Map;
 
 public class ServerFacade {
 
-    private final String baseUrl = "http://localhost:8080";
+    private String baseUrl;
+    private int port;
+
+    public ServerFacade() {
+        this.port = 8080;
+        this.baseUrl = "http://localhost:" + String.valueOf(this.port);
+    }
+
+    public ServerFacade(int port) {
+        this.port = port;
+        this.baseUrl = "http://localhost:" + String.valueOf(this.port);
+    }
 
     private <T> ResponseObject makeRequest(HttpURLConnection http, Object body, Class<T> returnType) {
         try {
