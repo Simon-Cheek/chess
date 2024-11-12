@@ -1,21 +1,28 @@
 package facade;
 
+import chess.ChessGame;
 import exception.ResponseException;
 import helpers.GameIdRecord;
+import helpers.GameListRecord;
 import helpers.ResponseObject;
 import model.AuthRecord;
+import model.GameRecord;
 import org.junit.jupiter.api.*;
 import server.Server;
 import service.Service;
+
+import java.util.ArrayList;
 
 
 public class ServerFacadeTests {
 
     private static Server server;
+    private static Service service;
 
     @BeforeAll
     public static void init() {
         server = new Server();
+        service = new Service();
         var port = server.run(8080);
         System.out.println("Started test HTTP server on " + port);
     }
@@ -28,7 +35,6 @@ public class ServerFacadeTests {
 
     @Test
     public void registerUserPositive() throws ResponseException {
-        Service service = new Service();
         service.deleteDB();
 
         ServerFacade facade = new ServerFacade();
@@ -40,7 +46,6 @@ public class ServerFacadeTests {
 
     @Test
     public void registerUserNegative() throws ResponseException {
-        Service service = new Service();
         service.deleteDB();
         ServerFacade facade = new ServerFacade();
         Assertions.assertThrows(
@@ -50,7 +55,6 @@ public class ServerFacadeTests {
 
     @Test
     public void loginUserPositive() throws ResponseException {
-        Service service = new Service();
         service.deleteDB();
 
         ServerFacade facade = new ServerFacade();
@@ -63,7 +67,6 @@ public class ServerFacadeTests {
 
     @Test
     public void loginUserNegative() throws ResponseException {
-        Service service = new Service();
         service.deleteDB();
         ServerFacade facade = new ServerFacade();
         facade.registerUser("username", "password", "email");
@@ -73,7 +76,6 @@ public class ServerFacadeTests {
 
     @Test
     public void logoutUserPositive() throws ResponseException {
-        Service service = new Service();
         service.deleteDB();
         ServerFacade facade = new ServerFacade();
         ResponseObject res = facade.registerUser("testyhehe", "testytest", "hehehe");
@@ -84,7 +86,6 @@ public class ServerFacadeTests {
 
     @Test
     public void logoutUserNegative() throws ResponseException {
-        Service service = new Service();
         service.deleteDB();
         ServerFacade facade = new ServerFacade();
         facade.registerUser("username", "password", "email");
@@ -94,19 +95,17 @@ public class ServerFacadeTests {
 
     @Test
     public void createGamePositive() throws ResponseException {
-        Service service = new Service();
         service.deleteDB();
         ServerFacade facade = new ServerFacade();
         ResponseObject res = facade.registerUser("testyhehe", "testytest", "hehehe");
         AuthRecord auth = (AuthRecord) res.data();
         ResponseObject createRes = facade.createGame(auth.authToken(), "gameName");
         GameIdRecord idRecord = (GameIdRecord) createRes.data();
-        Assertions.assertInstanceOf(Integer.class, idRecord.gameId());
+        Assertions.assertInstanceOf(Integer.class, idRecord.gameID());
     }
 
     @Test
     public void createGameNegative() throws ResponseException {
-        Service service = new Service();
         service.deleteDB();
         ServerFacade facade = new ServerFacade();
         ResponseObject res = facade.registerUser("testyhehe", "testytest", "hehehe");
@@ -114,6 +113,43 @@ public class ServerFacadeTests {
         facade.createGame(auth.authToken(), "gameName");
         ResponseObject createRes1 = facade.createGame(auth.authToken(), "gameName");
         Assertions.assertEquals(400, createRes1.statusCode());
+    }
+
+    @Test
+    public void listGamesPositive() throws ResponseException {
+        service.deleteDB();
+        ServerFacade facade = new ServerFacade();
+        ResponseObject res = facade.registerUser("testyhehe", "testytest", "hehehe");
+        AuthRecord auth = (AuthRecord) res.data();
+        facade.createGame(auth.authToken(), "gameName");
+        ResponseObject listRes = facade.listGames(auth.authToken());
+        GameListRecord gamesRecord = (GameListRecord) listRes.data();
+        ArrayList<GameRecord> games = gamesRecord.games();
+        Assertions.assertEquals(1, games.size());
+    }
+
+    @Test
+    public void listGamesNegative() throws ResponseException {
+        service.deleteDB();
+        ServerFacade facade = new ServerFacade();
+        ResponseObject res = facade.registerUser("testyhehe", "testytest", "hehehe");
+        AuthRecord auth = (AuthRecord) res.data();
+        facade.createGame(auth.authToken(), "gameName");
+        ResponseObject listRes = facade.listGames("wrongToken");
+        Assertions.assertEquals(401, listRes.statusCode());
+    }
+
+    @Test
+    public void joinGamePositive() throws ResponseException {
+        service.deleteDB();
+        ServerFacade facade = new ServerFacade();
+        ResponseObject res = facade.registerUser("testyhehe", "testytest", "hehehe");
+        AuthRecord auth = (AuthRecord) res.data();
+        ResponseObject createRes = facade.createGame(auth.authToken(), "gameName");
+        GameIdRecord game = (GameIdRecord) createRes.data();
+
+        ResponseObject joinRes = facade.joinGame(auth.authToken(), ChessGame.TeamColor.BLACK, game.gameID());
+        Assertions.assertEquals(200, joinRes.statusCode());
     }
 
 

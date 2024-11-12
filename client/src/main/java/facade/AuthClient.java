@@ -41,7 +41,7 @@ public class AuthClient {
 
         if (res.statusCode() == 200) {
             GameIdRecord gameIdRecord = (GameIdRecord) res.data();
-            return gameIdRecord.gameId();
+            return gameIdRecord.gameID();
         }
         switch (res.statusCode()) {
             case 400 -> throw new RuntimeException("Bad Request");
