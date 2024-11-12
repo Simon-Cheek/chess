@@ -1,6 +1,7 @@
 package facade;
 
 import exception.ResponseException;
+import helpers.GameIdRecord;
 import helpers.ResponseObject;
 import model.AuthRecord;
 import org.junit.jupiter.api.*;
@@ -68,7 +69,51 @@ public class ServerFacadeTests {
         facade.registerUser("username", "password", "email");
         ResponseObject res = facade.loginUser("username", "wrongPassword");
         Assertions.assertEquals(401, res.statusCode());
+    }
 
+    @Test
+    public void logoutUserPositive() throws ResponseException {
+        Service service = new Service();
+        service.deleteDB();
+        ServerFacade facade = new ServerFacade();
+        ResponseObject res = facade.registerUser("testyhehe", "testytest", "hehehe");
+        AuthRecord auth = (AuthRecord) res.data();
+        ResponseObject logoutRes = facade.logoutUser(auth.authToken());
+        Assertions.assertEquals(200, logoutRes.statusCode());
+    }
+
+    @Test
+    public void logoutUserNegative() throws ResponseException {
+        Service service = new Service();
+        service.deleteDB();
+        ServerFacade facade = new ServerFacade();
+        facade.registerUser("username", "password", "email");
+        ResponseObject res = facade.logoutUser("wrongToken");
+        Assertions.assertEquals(401, res.statusCode());
+    }
+
+    @Test
+    public void createGamePositive() throws ResponseException {
+        Service service = new Service();
+        service.deleteDB();
+        ServerFacade facade = new ServerFacade();
+        ResponseObject res = facade.registerUser("testyhehe", "testytest", "hehehe");
+        AuthRecord auth = (AuthRecord) res.data();
+        ResponseObject createRes = facade.createGame(auth.authToken(), "gameName");
+        GameIdRecord idRecord = (GameIdRecord) createRes.data();
+        Assertions.assertInstanceOf(Integer.class, idRecord.gameId());
+    }
+
+    @Test
+    public void createGameNegative() throws ResponseException {
+        Service service = new Service();
+        service.deleteDB();
+        ServerFacade facade = new ServerFacade();
+        ResponseObject res = facade.registerUser("testyhehe", "testytest", "hehehe");
+        AuthRecord auth = (AuthRecord) res.data();
+        facade.createGame(auth.authToken(), "gameName");
+        ResponseObject createRes1 = facade.createGame(auth.authToken(), "gameName");
+        Assertions.assertEquals(400, createRes1.statusCode());
     }
 
 
