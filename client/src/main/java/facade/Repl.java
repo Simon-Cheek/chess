@@ -1,3 +1,5 @@
+package facade;
+
 import ui.EscapeSequences;
 
 import java.util.Scanner;

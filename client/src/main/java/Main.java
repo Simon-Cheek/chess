@@ -1,4 +1,4 @@
-import chess.*;
+import facade.Repl;
 
 public class Main {
 

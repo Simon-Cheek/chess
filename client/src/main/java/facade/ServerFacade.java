@@ -1,3 +1,5 @@
+package facade;
+
 import chess.ChessGame;
 import com.google.gson.Gson;
 import helpers.GameIdRecord;
@@ -24,7 +26,6 @@ public class ServerFacade {
                }
             }
             http.connect();
-
             if (http.getResponseCode() >= 400) {
                 return new ResponseObject(http.getResponseCode(), null);
             }
@@ -34,7 +35,6 @@ public class ServerFacade {
                     return new ResponseObject(http.getResponseCode(), new Gson().fromJson(inputStreamReader, returnType));
                 }
             } else return new ResponseObject(http.getResponseCode(), null);
-
         } catch (Exception e) {
             throw new RuntimeException("Invalid Connection");
         }

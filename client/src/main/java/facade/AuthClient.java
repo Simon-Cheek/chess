@@ -1,3 +1,5 @@
+package facade;
+
 import chess.ChessGame;
 import helpers.GameIdRecord;
 import helpers.GameListRecord;

@@ -1,3 +1,5 @@
+package facade;
+
 import chess.ChessGame;
 import ui.BoardBuilder;
 import helpers.HelpInfo;
