@@ -1,3 +1,4 @@
+import chess.ChessGame;
 import helpers.GameIdRecord;
 import helpers.GameListRecord;
 import helpers.ResponseObject;
@@ -7,6 +8,16 @@ import java.util.ArrayList;
 
 public class AuthClient {
 
+    public static void joinGame(ServerFacade facade, String authToken, ChessGame.TeamColor color, int gameId) {
+        if (authToken.isEmpty()) { throw new RuntimeException("Unauthorized"); }
+        ResponseObject res = facade.joinGame(authToken, color, gameId);
+        if (res.statusCode() == 200) { return; }
+        switch (res.statusCode()) {
+            case 401 -> throw new RuntimeException("Unauthorized");
+            case 403 -> throw new RuntimeException("Already Taken");
+            default -> throw new RuntimeException("Server Error");
+        }
+    }
 
     public static ArrayList<GameRecord> listGames(ServerFacade facade, String authToken) {
         if (authToken.isEmpty()) { throw new RuntimeException("Unauthorized"); }

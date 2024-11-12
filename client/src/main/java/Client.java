@@ -1,4 +1,6 @@
-import helpers.GameListRecord;
+import chess.ChessGame;
+import helpers.BoardBuilder;
+import helpers.HelpInfo;
 import helpers.ResponseObject;
 import model.AuthRecord;
 import model.GameRecord;
@@ -11,7 +13,7 @@ public class Client {
 
     private String authToken;
     private String username;
-    private ServerFacade serverFacade;
+    private final ServerFacade serverFacade;
 
     private ArrayList<GameRecord> games;
 
@@ -32,12 +34,42 @@ public class Client {
             case "logout" -> this.logout();
             case "create" -> this.create(params);
             case "list" -> this.listGames();
-            default -> this.help();
+            case "join" -> this.joinGame(params);
+            case "observe" -> this.observeGame(params);
+            default -> HelpInfo.help(this.isLoggedIn());
         };
+    }
+
+    public String observeGame(String[] params) {
+        if (params.length != 1) { throw new RuntimeException("Invalid Argument Length"); }
+        ClientGameInfo gameInfo = this.getGameInfo(params[0]);
+        String statement = String.format("Observing Game %d) %s\n", gameInfo.gameNumber(), gameInfo.gameName());
+        return statement + BoardBuilder.buildBoard(this.games.get(gameInfo.gameNumber() - 1).game());
+    }
+
+
+    public String joinGame(String[] params) {
+        if (params.length != 2) { throw new RuntimeException("Invalid Argument Length"); }
+
+        ClientGameInfo gameInfo = this.getGameInfo(params[0]);
+
+        String colorString = params[1].toLowerCase();
+        if (!colorString.equals("white") && !colorString.equals("black")) {
+            throw new RuntimeException("Invalid Color");
+        }
+        ChessGame.TeamColor color =
+                colorString.equals("white") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
+
+        AuthClient.joinGame(this.serverFacade, this.authToken, color, gameInfo.gameId());
+        String statement =
+                String.format("Successfully joined game %d) %s\n", gameInfo.gameNumber(), gameInfo.gameName());
+        return statement + BoardBuilder.buildBoard(this.games.get(gameInfo.gameNumber() - 1).game());
     }
 
     public String listGames() {
         ArrayList<GameRecord> games = AuthClient.listGames(this.serverFacade, this.authToken);
+        this.games = games;
+
         StringBuilder gameInfo = new StringBuilder();
         gameInfo.append(EscapeSequences.SET_TEXT_ITALIC);
 
@@ -47,9 +79,7 @@ public class Client {
                     "%d) Name: %s, White Player: %s, Black Player: %s\n",
                     i + 1, game.gameName(), game.whiteUsername(), game.blackUsername()));
         }
-
         gameInfo.append(EscapeSequences.RESET_TEXT_ITALIC);
-
         return gameInfo.toString();
     }
 
@@ -102,55 +132,26 @@ public class Client {
         }
     }
 
-    public String help() {
-
-        String notLoggedin = String.format("""
-                %s register <USERNAME> <PASSWORD> <EMAIL> %s - to create an account
-                %s login <USERNAME> <PASSWORD> %s - to play chess
-                %s quit %s - playing chess
-                %s help %s - with possible commands
-                """, EscapeSequences.SET_TEXT_COLOR_BLUE,
-                EscapeSequences.RESET_TEXT_COLOR,
-                EscapeSequences.SET_TEXT_COLOR_BLUE,
-                EscapeSequences.RESET_TEXT_COLOR,
-                EscapeSequences.SET_TEXT_COLOR_BLUE,
-                EscapeSequences.RESET_TEXT_COLOR,
-                EscapeSequences.SET_TEXT_COLOR_BLUE,
-                EscapeSequences.RESET_TEXT_COLOR
-        );
-
-        String loggedIn = String.format("""
-                %s create <NAME> %s - a game
-                %s list %s - games
-                %s join <ID> [WHITE|BLACK] %s - a game
-                %s observe <ID> %s - a game
-                %s logout %s - when you are done
-                %s quit %s - playing chess
-                %s help %s - with possible commands
-                """, EscapeSequences.SET_TEXT_COLOR_BLUE,
-                EscapeSequences.RESET_TEXT_COLOR,
-                EscapeSequences.SET_TEXT_COLOR_BLUE,
-                EscapeSequences.RESET_TEXT_COLOR,
-                EscapeSequences.SET_TEXT_COLOR_BLUE,
-                EscapeSequences.RESET_TEXT_COLOR,
-                EscapeSequences.SET_TEXT_COLOR_BLUE,
-                EscapeSequences.RESET_TEXT_COLOR,
-                EscapeSequences.SET_TEXT_COLOR_BLUE,
-                EscapeSequences.RESET_TEXT_COLOR,
-                EscapeSequences.SET_TEXT_COLOR_BLUE,
-                EscapeSequences.RESET_TEXT_COLOR,
-                EscapeSequences.SET_TEXT_COLOR_BLUE,
-                EscapeSequences.RESET_TEXT_COLOR
-        );
-
-        return this.isLoggedIn() ? loggedIn : notLoggedin;
-    }
 
     public boolean isLoggedIn() {
         return !this.username.isEmpty();
     }
 
-    public ArrayList<GameRecord> getGames() { return this.games; }
+    public record ClientGameInfo(int gameNumber, int gameId, String gameName) {}
+
+    private ClientGameInfo getGameInfo(String gameString) {
+        int gameNumber;
+        int gameId;
+        String gameName;
+        try {
+            gameNumber = Integer.parseInt(gameString);
+            gameId = this.games.get(gameNumber - 1).gameID();
+            gameName = this.games.get(gameNumber - 1).gameName();
+        } catch (Exception e) {
+            throw new RuntimeException("Invalid ID or No Games. List Games to view IDs.");
+        }
+        return new ClientGameInfo(gameNumber, gameId, gameName);
+    }
 
     private String setLogin(ResponseObject res) {
         AuthRecord auth = (AuthRecord) res.data();

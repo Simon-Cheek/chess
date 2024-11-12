@@ -1,3 +1,4 @@
+import chess.ChessGame;
 import com.google.gson.Gson;
 import helpers.GameIdRecord;
 import helpers.GameListRecord;
@@ -39,6 +40,23 @@ public class ServerFacade {
         }
     }
 
+    public ResponseObject joinGame(String authToken, ChessGame.TeamColor color, int gameId) {
+        try {
+            URI uri = new URI(this.baseUrl + "/game");
+            HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
+            http.setRequestMethod("PUT");
+            http.setRequestProperty("Authorization", authToken);
+            http.setDoOutput(true);
+
+            Map<String, String> body = Map.of("playerColor", color.toString(), "gameID", String.valueOf(gameId));
+
+            return this.makeRequest(http, body, null);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Invalid Request");
+        }
+    }
+
     public ResponseObject listGames(String authToken) {
         try {
             URI uri = new URI(this.baseUrl + "/game");
@@ -50,7 +68,6 @@ public class ServerFacade {
         } catch (Exception e) {
             throw new RuntimeException("Invalid Request");
         }
-
     }
 
     public ResponseObject createGame(String authToken, String gameName) {
