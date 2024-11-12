@@ -45,7 +45,7 @@ public class ServerFacade {
                     InputStreamReader inputStreamReader = new InputStreamReader(resBody);
                     return new ResponseObject(http.getResponseCode(), new Gson().fromJson(inputStreamReader, returnType));
                 }
-            } else return new ResponseObject(http.getResponseCode(), null);
+            } else { return new ResponseObject(http.getResponseCode(), null); }
         } catch (Exception e) {
             throw new RuntimeException("Invalid Connection");
         }
