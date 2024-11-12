@@ -1,7 +1,10 @@
+import helpers.GameListRecord;
 import helpers.ResponseObject;
 import model.AuthRecord;
+import model.GameRecord;
 import ui.EscapeSequences;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Client {
@@ -9,6 +12,8 @@ public class Client {
     private String authToken;
     private String username;
     private ServerFacade serverFacade;
+
+    private ArrayList<GameRecord> games;
 
     public Client() {
         this.username = "";
@@ -26,8 +31,26 @@ public class Client {
             case "quit" -> "quit";
             case "logout" -> this.logout();
             case "create" -> this.create(params);
+            case "list" -> this.listGames();
             default -> this.help();
         };
+    }
+
+    public String listGames() {
+        ArrayList<GameRecord> games = AuthClient.listGames(this.serverFacade, this.authToken);
+        StringBuilder gameInfo = new StringBuilder();
+        gameInfo.append(EscapeSequences.SET_TEXT_ITALIC);
+
+        for (int i = 0; i < games.size(); i++) {
+            GameRecord game = games.get(i);
+            gameInfo.append(String.format(
+                    "%d) Name: %s, White Player: %s, Black Player: %s\n",
+                    i + 1, game.gameName(), game.whiteUsername(), game.blackUsername()));
+        }
+
+        gameInfo.append(EscapeSequences.RESET_TEXT_ITALIC);
+
+        return gameInfo.toString();
     }
 
     public String create(String[] params) {
@@ -126,6 +149,8 @@ public class Client {
     public boolean isLoggedIn() {
         return !this.username.isEmpty();
     }
+
+    public ArrayList<GameRecord> getGames() { return this.games; }
 
     private String setLogin(ResponseObject res) {
         AuthRecord auth = (AuthRecord) res.data();

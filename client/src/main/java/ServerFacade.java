@@ -1,5 +1,6 @@
 import com.google.gson.Gson;
 import helpers.GameIdRecord;
+import helpers.GameListRecord;
 import helpers.ResponseObject;
 import model.AuthRecord;
 
@@ -36,6 +37,20 @@ public class ServerFacade {
         } catch (Exception e) {
             throw new RuntimeException("Invalid Connection");
         }
+    }
+
+    public ResponseObject listGames(String authToken) {
+        try {
+            URI uri = new URI(this.baseUrl + "/game");
+            HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
+            http.setRequestMethod("GET");
+            http.setRequestProperty("Authorization", authToken);
+            return this.makeRequest(http, null, GameListRecord.class);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Invalid Request");
+        }
+
     }
 
     public ResponseObject createGame(String authToken, String gameName) {
