@@ -1,5 +1,5 @@
 import chess.ChessGame;
-import helpers.BoardBuilder;
+import ui.BoardBuilder;
 import helpers.HelpInfo;
 import helpers.ResponseObject;
 import model.AuthRecord;
