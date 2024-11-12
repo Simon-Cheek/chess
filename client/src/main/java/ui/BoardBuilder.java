@@ -16,9 +16,8 @@ public class BoardBuilder {
         String reset = EscapeSequences.RESET_TEXT_COLOR;
 
         StringBuilder whiteBoard = new StringBuilder();
-
+        whiteBoard.append("Chess Board: White Perspective\n");
         whiteBoard.append(text).append("    h    g    f    e    d    c    b    a\n").append(reset);
-
         for (int row = 8; row >= 1; row--) {
             whiteBoard.append(text).append(row).append(reset).append(" ");
             for (int col = 1; col <= 8; col++) {
@@ -29,14 +28,31 @@ public class BoardBuilder {
             whiteBoard.append(reset).append(EscapeSequences.RESET_BG_COLOR)
                     .append(" ").append(text).append(row).append(reset).append("\n");
         }
+        whiteBoard.append(text).append("    h    g    f    e    d    c    b    a\n\n").append(reset);
 
-        whiteBoard.append(text).append("    h    g    f    e    d    c    b    a\n").append(reset);
+        StringBuilder blackBoard = new StringBuilder();
+        blackBoard.append("Chess Board: Black Perspective\n");
+        blackBoard.append(text).append("    h    g    f    e    d    c    b    a\n").append(reset);
+        for (int row = 1; row <= 8; row++) {
+            blackBoard.append(text).append(row).append(reset).append(" ");
+            for (int col = 1; col <= 8; col++) {
+                String bgColor = (row + col) % 2 == 0 ? dark: light;
+                String piece = getPiece(game, row, col);
+                blackBoard.append(bgColor).append(" ").append(piece).append(" ");
+            }
+            blackBoard.append(reset).append(EscapeSequences.RESET_BG_COLOR)
+                    .append(" ").append(text).append(row).append(reset).append("\n");
+        }
+        blackBoard.append(text).append("    h    g    f    e    d    c    b    a\n").append(reset);
 
-        return whiteBoard.toString();
+        return whiteBoard.toString() + blackBoard.toString();
     }
 
 
     private static String getPiece(ChessGame game, int row, int column) {
+
+        String whitePiece = EscapeSequences.SET_TEXT_COLOR_WHITE;
+        String blackPiece = EscapeSequences.SET_TEXT_COLOR_RED;
 
         ChessBoard board = game.getBoard();
         ChessPosition pos = new ChessPosition(row, column);
@@ -46,21 +62,21 @@ public class BoardBuilder {
 
         if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
             return switch(piece.getPieceType()) {
-                case KNIGHT -> EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.WHITE_KNIGHT;
-                case BISHOP -> EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.WHITE_BISHOP;
-                case ROOK -> EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.WHITE_ROOK;
-                case KING -> EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.WHITE_KING;
-                case QUEEN -> EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.WHITE_QUEEN;
-                default -> EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.WHITE_PAWN;
+                case KNIGHT -> whitePiece + EscapeSequences.WHITE_KNIGHT;
+                case BISHOP -> whitePiece + EscapeSequences.WHITE_BISHOP;
+                case ROOK -> whitePiece + EscapeSequences.WHITE_ROOK;
+                case KING -> whitePiece + EscapeSequences.WHITE_KING;
+                case QUEEN -> whitePiece + EscapeSequences.WHITE_QUEEN;
+                default -> whitePiece + EscapeSequences.WHITE_PAWN;
             };
         } else {
             return switch(piece.getPieceType()) {
-                case KNIGHT -> EscapeSequences.SET_TEXT_COLOR_RED + EscapeSequences.BLACK_KNIGHT;
-                case BISHOP -> EscapeSequences.SET_TEXT_COLOR_RED + EscapeSequences.BLACK_BISHOP;
-                case ROOK -> EscapeSequences.SET_TEXT_COLOR_RED + EscapeSequences.BLACK_ROOK;
-                case KING -> EscapeSequences.SET_TEXT_COLOR_RED + EscapeSequences.BLACK_KING;
-                case QUEEN -> EscapeSequences.SET_TEXT_COLOR_RED + EscapeSequences.BLACK_QUEEN;
-                default -> EscapeSequences.SET_TEXT_COLOR_RED + EscapeSequences.BLACK_PAWN;
+                case KNIGHT -> blackPiece + EscapeSequences.BLACK_KNIGHT;
+                case BISHOP -> blackPiece + EscapeSequences.BLACK_BISHOP;
+                case ROOK -> blackPiece + EscapeSequences.BLACK_ROOK;
+                case KING -> blackPiece + EscapeSequences.BLACK_KING;
+                case QUEEN -> blackPiece + EscapeSequences.BLACK_QUEEN;
+                default -> blackPiece + EscapeSequences.BLACK_PAWN;
             };
         }
     }
