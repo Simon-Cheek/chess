@@ -1,7 +1,8 @@
-package facade;
+package client;
 
 import chess.ChessGame;
 import exception.ResponseException;
+import facade.ServerFacade;
 import helpers.GameIdRecord;
 import helpers.GameListRecord;
 import helpers.ResponseObject;
