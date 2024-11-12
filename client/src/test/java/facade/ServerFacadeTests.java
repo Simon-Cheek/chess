@@ -152,6 +152,20 @@ public class ServerFacadeTests {
         Assertions.assertEquals(200, joinRes.statusCode());
     }
 
+    @Test
+    public void joinGameNegative() throws ResponseException {
+        service.deleteDB();
+        ServerFacade facade = new ServerFacade();
+        ResponseObject res = facade.registerUser("testyhehe", "testytest", "hehehe");
+        AuthRecord auth = (AuthRecord) res.data();
+        ResponseObject createRes = facade.createGame(auth.authToken(), "gameName");
+        GameIdRecord game = (GameIdRecord) createRes.data();
+
+        facade.joinGame(auth.authToken(), ChessGame.TeamColor.BLACK, game.gameID());
+        ResponseObject joinRes1 = facade.joinGame(auth.authToken(), ChessGame.TeamColor.BLACK, game.gameID());
+        Assertions.assertEquals(403, joinRes1.statusCode());
+    }
+
 
 
 }
