@@ -1,3 +1,4 @@
+import helpers.ResponseObject;
 import model.AuthRecord;
 import ui.EscapeSequences;
 
@@ -24,8 +25,15 @@ public class Client {
             case "login" -> this.login(params);
             case "quit" -> "quit";
             case "logout" -> this.logout();
+            case "create" -> this.create(params);
             default -> this.help();
         };
+    }
+
+    public String create(String[] params) {
+        if (params.length != 1) { throw new RuntimeException("Invalid Argument Length"); }
+        AuthClient.createGame(this.serverFacade, this.authToken, params[0]);
+        return "Created game: " + params[0];
     }
 
     public String logout() {

@@ -1,4 +1,6 @@
 import com.google.gson.Gson;
+import helpers.GameIdRecord;
+import helpers.ResponseObject;
 import model.AuthRecord;
 
 import java.io.InputStream;
@@ -33,6 +35,21 @@ public class ServerFacade {
 
         } catch (Exception e) {
             throw new RuntimeException("Invalid Connection");
+        }
+    }
+
+    public ResponseObject createGame(String authToken, String gameName) {
+        try {
+            URI uri = new URI(this.baseUrl + "/game");
+            HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
+            http.setRequestMethod("POST");
+            http.setDoOutput(true);
+            http.setRequestProperty("Authorization", authToken);
+            Map<String, String> body = Map.of("gameName", gameName);
+
+            return this.makeRequest(http, body, GameIdRecord.class);
+        } catch (Exception e) {
+            throw new RuntimeException("Invalid Request");
         }
     }
 
