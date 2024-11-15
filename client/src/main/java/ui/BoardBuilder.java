@@ -7,28 +7,13 @@ import chess.ChessPosition;
 
 public class BoardBuilder {
 
+    static String light = EscapeSequences.SET_BG_COLOR_DARK_GREY;
+    static String dark = EscapeSequences.SET_BG_COLOR_BLACK;
+    static String text = EscapeSequences.SET_TEXT_COLOR_YELLOW;
+    static String reset = EscapeSequences.RESET_TEXT_COLOR;
 
-    public static String buildBoard(ChessGame game) {
 
-        String light = EscapeSequences.SET_BG_COLOR_DARK_GREY;
-        String dark = EscapeSequences.SET_BG_COLOR_BLACK;
-        String text = EscapeSequences.SET_TEXT_COLOR_YELLOW;
-        String reset = EscapeSequences.RESET_TEXT_COLOR;
-
-        StringBuilder whiteBoard = new StringBuilder();
-        whiteBoard.append("Chess Board: White Perspective\n");
-        whiteBoard.append(text).append("    h    g    f    e    d    c    b    a\n").append(reset);
-        for (int row = 8; row >= 1; row--) {
-            whiteBoard.append(text).append(row).append(reset).append(" ");
-            for (int col = 1; col <= 8; col++) {
-                String bgColor = (row + col) % 2 == 0 ? dark: light;
-                String piece = getPiece(game, row, col);
-                whiteBoard.append(bgColor).append(" ").append(piece).append(" ");
-            }
-            whiteBoard.append(reset).append(EscapeSequences.RESET_BG_COLOR)
-                    .append(" ").append(text).append(row).append(reset).append("\n");
-        }
-        whiteBoard.append(text).append("    h    g    f    e    d    c    b    a\n\n").append(reset);
+    public static String buildBlackBoard(ChessGame game) {
 
         StringBuilder blackBoard = new StringBuilder();
         blackBoard.append("Chess Board: Black Perspective\n");
@@ -45,7 +30,27 @@ public class BoardBuilder {
         }
         blackBoard.append(text).append("    a    b    c    d    e    f    g    h\n").append(reset);
 
-        return whiteBoard.toString() + blackBoard.toString();
+        return blackBoard.toString();
+    }
+
+    public static String buildWhiteBoard(ChessGame game) {
+
+        StringBuilder whiteBoard = new StringBuilder();
+        whiteBoard.append("Chess Board: White Perspective\n");
+        whiteBoard.append(text).append("    h    g    f    e    d    c    b    a\n").append(reset);
+        for (int row = 8; row >= 1; row--) {
+            whiteBoard.append(text).append(row).append(reset).append(" ");
+            for (int col = 1; col <= 8; col++) {
+                String bgColor = (row + col) % 2 == 0 ? dark: light;
+                String piece = getPiece(game, row, col);
+                whiteBoard.append(bgColor).append(" ").append(piece).append(" ");
+            }
+            whiteBoard.append(reset).append(EscapeSequences.RESET_BG_COLOR)
+                    .append(" ").append(text).append(row).append(reset).append("\n");
+        }
+        whiteBoard.append(text).append("    h    g    f    e    d    c    b    a\n\n").append(reset);
+
+        return whiteBoard.toString();
     }
 
 

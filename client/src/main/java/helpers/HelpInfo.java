@@ -4,7 +4,7 @@ import ui.EscapeSequences;
 
 public class HelpInfo {
 
-    public static String help(boolean isLoggedIn) {
+    public static String help(boolean isLoggedIn, boolean isInGame) {
 
         String notLoggedin = String.format("""
                 %s register <USERNAME> <PASSWORD> <EMAIL> %s- to create an account
@@ -45,6 +45,26 @@ public class HelpInfo {
                 EscapeSequences.RESET_TEXT_COLOR
         );
 
-        return isLoggedIn ? loggedIn : notLoggedin;
+        String inGame = String.format("""
+                %s redraw %s- the chess board
+                %s leave %s- the game
+                %s resign %s- the game
+                %s make move <START_POS> <END_POS> %s- a game
+                %s highlight <POS> %s- moves for given piece
+                %s help %s- with possible commands
+                """, EscapeSequences.SET_TEXT_COLOR_BLUE,
+                EscapeSequences.RESET_TEXT_COLOR,
+                EscapeSequences.SET_TEXT_COLOR_BLUE,
+                EscapeSequences.RESET_TEXT_COLOR,
+                EscapeSequences.SET_TEXT_COLOR_BLUE,
+                EscapeSequences.RESET_TEXT_COLOR,
+                EscapeSequences.SET_TEXT_COLOR_BLUE,
+                EscapeSequences.RESET_TEXT_COLOR,
+                EscapeSequences.SET_TEXT_COLOR_BLUE,
+                EscapeSequences.RESET_TEXT_COLOR,
+                EscapeSequences.SET_TEXT_COLOR_BLUE,
+                EscapeSequences.RESET_TEXT_COLOR);
+
+        return isInGame ? inGame : isLoggedIn ? loggedIn : notLoggedin;
     }
 }

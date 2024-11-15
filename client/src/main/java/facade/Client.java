@@ -16,13 +16,14 @@ public class Client {
     private String authToken;
     private String username;
     private final ServerFacade serverFacade;
-
     private ArrayList<GameRecord> games;
+    boolean isInGame;
 
     public Client() {
         this.username = "";
         this.authToken = "";
         this.serverFacade = new ServerFacade();
+        this.isInGame = false;
     }
 
     public String parse(String input) {
@@ -38,7 +39,7 @@ public class Client {
             case "list" -> this.listGames();
             case "join" -> this.joinGame(params);
             case "observe" -> this.observeGame(params);
-            default -> HelpInfo.help(this.isLoggedIn());
+            default -> HelpInfo.help(this.isLoggedIn(), this.isInGame);
         };
     }
 
@@ -46,7 +47,8 @@ public class Client {
         if (params.length != 1) { throw new RuntimeException("Invalid Argument Length"); }
         ClientGameInfo gameInfo = this.getGameInfo(params[0]);
         String statement = String.format("Observing Game %d) %s\n", gameInfo.gameNumber(), gameInfo.gameName());
-        return statement + BoardBuilder.buildBoard(this.games.get(gameInfo.gameNumber() - 1).game());
+        ChessGame game = this.games.get(gameInfo.gameNumber() - 1).game();
+        return statement + BoardBuilder.buildWhiteBoard(game) + BoardBuilder.buildBlackBoard(game);
     }
 
 
@@ -65,7 +67,9 @@ public class Client {
         AuthClient.joinGame(this.serverFacade, this.authToken, color, gameInfo.gameId());
         String statement =
                 String.format("Successfully joined game %d) %s\n", gameInfo.gameNumber(), gameInfo.gameName());
-        return statement + BoardBuilder.buildBoard(this.games.get(gameInfo.gameNumber() - 1).game());
+        ChessGame game = this.games.get(gameInfo.gameNumber() - 1).game();
+        this.isInGame = true;
+        return statement + BoardBuilder.buildWhiteBoard(game) + BoardBuilder.buildBlackBoard(game);
     }
 
     public String listGames() {
