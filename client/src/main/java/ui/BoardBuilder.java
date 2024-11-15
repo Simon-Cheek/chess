@@ -21,7 +21,7 @@ public class BoardBuilder {
         for (int row = 8; row >= 1; row--) {
             whiteBoard.append(text).append(row).append(reset).append(" ");
             for (int col = 1; col <= 8; col++) {
-                String bgColor = (row + col) % 2 == 0 ? light: dark;
+                String bgColor = (row + col) % 2 == 0 ? dark: light;
                 String piece = getPiece(game, row, col);
                 whiteBoard.append(bgColor).append(" ").append(piece).append(" ");
             }
@@ -32,10 +32,10 @@ public class BoardBuilder {
 
         StringBuilder blackBoard = new StringBuilder();
         blackBoard.append("Chess Board: Black Perspective\n");
-        blackBoard.append(text).append("    h    g    f    e    d    c    b    a\n").append(reset);
+        blackBoard.append(text).append("    a    b    c    d    e    f    g    h\n").append(reset);
         for (int row = 1; row <= 8; row++) {
             blackBoard.append(text).append(row).append(reset).append(" ");
-            for (int col = 1; col <= 8; col++) {
+            for (int col = 8; col >= 1; col--) {
                 String bgColor = (row + col) % 2 == 0 ? dark: light;
                 String piece = getPiece(game, row, col);
                 blackBoard.append(bgColor).append(" ").append(piece).append(" ");
@@ -43,7 +43,7 @@ public class BoardBuilder {
             blackBoard.append(reset).append(EscapeSequences.RESET_BG_COLOR)
                     .append(" ").append(text).append(row).append(reset).append("\n");
         }
-        blackBoard.append(text).append("    h    g    f    e    d    c    b    a\n").append(reset);
+        blackBoard.append(text).append("    a    b    c    d    e    f    g    h\n").append(reset);
 
         return whiteBoard.toString() + blackBoard.toString();
     }
