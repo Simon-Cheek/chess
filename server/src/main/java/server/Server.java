@@ -2,7 +2,6 @@ package server;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
-import dataaccess.DataAccessException;
 import exception.ResponseException;
 import model.AuthRecord;
 import model.GameRecord;
@@ -11,6 +10,7 @@ import model.UserRecord;
 import spark.*;
 
 import service.Service;
+import websocket.WebSocketHandler;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -18,9 +18,11 @@ import java.util.Map;
 public class Server {
 
     private Service service;
+    private final WebSocketHandler webSocketHandler;
 
     public Server() {
         this.service = new Service();
+        this.webSocketHandler = new WebSocketHandler();
     }
 
 
@@ -28,6 +30,8 @@ public class Server {
         Spark.port(desiredPort);
 
         Spark.staticFiles.location("web");
+
+        Spark.webSocket("/ws", this.webSocketHandler);
 
         // Register your endpoints and handle exceptions here.
         Spark.get("/game", this::listGames);
