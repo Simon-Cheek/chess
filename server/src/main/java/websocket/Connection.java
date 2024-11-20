@@ -9,10 +9,9 @@ public class Connection {
     public Session session;
     public int gameId;
 
-    public Connection(String userName, Session session, int gameId) {
+    public Connection(String userName, Session session) {
         this.userName = userName;
         this.session = session;
-        this.gameId = gameId;
     }
 
     public void send(String msg) throws IOException {

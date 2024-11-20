@@ -94,6 +94,10 @@ public class Service {
         return this.gameDAO.createGame(gameName);
     }
 
+    public GameRecord findGame(int gameId) throws ResponseException {
+        return this.gameDAO.findGame(gameId);
+    }
+
     // Logs user out on existing session
     public void logoutUser(String authToken) throws ResponseException {
         this.verifyUser(authToken);
