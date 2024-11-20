@@ -1,5 +1,6 @@
 package websocket;
 
+import chess.ChessMove;
 import com.google.gson.Gson;
 import model.GameRecord;
 import org.eclipse.jetty.websocket.api.Session;
@@ -16,6 +17,41 @@ public class ConnectionManager {
         this.connections = new HashMap<>();
     }
 
+    private String craftMoveMessage(String userName, ChessMove move) {
+        String startPos = "";
+        String endPos = "";
+        int startRow = move.getStartPosition().getRow();
+        int startCol = move.getStartPosition().getColumn();
+        startPos += (char) ('a' + (startCol - 1));
+        startPos += String.valueOf(startRow);
+        int endRow = move.getEndPosition().getRow();
+        int endCol = move.getEndPosition().getColumn();
+        endPos += (char) ('a' + (endCol - 1));
+        endPos += String.valueOf(endRow);
+
+        return userName + " moved from " + startPos + " to " + endPos;
+    }
+
+    public void makeMove(Session session, String userName, GameRecord game, ChessMove move) throws IOException {
+
+        // LOAD GAME to everyone
+        ServerMessage loadMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME);
+        loadMessage.setGame(game);
+        ArrayList<Connection> connections = this.connections.get(game.gameID());
+        for (Connection conn : connections) {
+            conn.send(new Gson().toJson(loadMessage));
+        }
+        // NOTIFICATION to everyone except the session holder
+        ServerMessage notifyMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
+        notifyMessage.setMessage(this.craftMoveMessage(userName, move));
+        for (Connection conn : connections) {
+            if (!conn.session.equals(session)) {
+                conn.send(new Gson().toJson(notifyMessage));
+            }
+        }
+
+    }
+
     public void connectToGame(String userName, Session session, GameRecord game) throws IOException {
         int gameId = game.gameID();
 
@@ -23,7 +59,7 @@ public class ConnectionManager {
         ServerMessage serverMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
         String action = " as an observer.";
         if (game.whiteUsername().equals(userName)) { action = " as player White."; }
-        else if (game.blackUsername().equals(userName)) { action = " as player Black."; }
+        if (game.blackUsername().equals(userName)) { action = " as player Black."; }
         serverMessage.setMessage(String.format("%s joined the game %s", userName, action));
         this.connections.computeIfAbsent(gameId, key -> new ArrayList<Connection>());
 

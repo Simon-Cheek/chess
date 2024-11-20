@@ -45,6 +45,9 @@ public class WebSocketHandler {
                 case MAKE_MOVE:
                     ChessMove move = command.getMove();
                     if (move == null) { throw new RuntimeException("No Move"); }
+                    game.game().makeMove(move);
+                    this.service.saveGame(game);
+                    this.connectionManager.makeMove(session, user, game, move);
                 case LEAVE:
                     System.out.println("Leave");
                     break;
