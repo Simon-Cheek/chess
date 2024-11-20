@@ -1,5 +1,6 @@
 package websocket;
 
+import chess.ChessGame;
 import chess.ChessMove;
 import com.google.gson.Gson;
 import exception.ResponseException;
@@ -28,6 +29,14 @@ public class WebSocketHandler {
         session.getRemote().sendString(String.format("Error: %s", msg));
     }
 
+    private boolean verifyPlayerMove(GameRecord game, String user) {
+        ChessGame.TeamColor currentColor = game.game().getTeamTurn();
+        if (currentColor == ChessGame.TeamColor.WHITE) {
+            return game.whiteUsername().equals(user);
+        }
+        return game.blackUsername().equals(user);
+    }
+
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws IOException {
         UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
@@ -44,6 +53,9 @@ public class WebSocketHandler {
                     break;
                 case MAKE_MOVE:
                     ChessMove move = command.getMove();
+                    if (!this.verifyPlayerMove(game, user)) {
+                        throw new RuntimeException("Invalid Player");
+                    }
                     if (move == null) { throw new RuntimeException("No Move"); }
                     game.game().makeMove(move);
                     this.service.saveGame(game);
