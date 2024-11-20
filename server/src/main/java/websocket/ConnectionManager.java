@@ -32,6 +32,19 @@ public class ConnectionManager {
         return userName + " moved from " + startPos + " to " + endPos;
     }
 
+    public void leaveGame(Session session, String userName, int gameId) throws IOException {
+
+        // Remove Session from Game Connection List
+        ArrayList<Connection> connections = this.connections.get(gameId);
+        connections.removeIf((conn) -> conn.session.equals(session));
+        // Send NOTIFY to remaining Sessions
+        ServerMessage notifyMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
+        notifyMessage.setMessage(userName + " has left the game.");
+        for (Connection conn : connections) {
+            conn.send(new Gson().toJson(notifyMessage));
+        }
+    }
+
     public void makeMove(Session session, String userName, GameRecord game, ChessMove move) throws IOException {
 
         // LOAD GAME to everyone

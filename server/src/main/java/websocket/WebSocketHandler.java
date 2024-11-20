@@ -61,7 +61,11 @@ public class WebSocketHandler {
                     this.service.saveGame(game);
                     this.connectionManager.makeMove(session, user, game, move);
                 case LEAVE:
-                    System.out.println("Leave");
+                    String whiteUser = game.whiteUsername().equals(user) ? null : game.whiteUsername();
+                    String blackUser = game.blackUsername().equals(user) ? null : game.blackUsername();
+                    GameRecord newGame = new GameRecord(gameId, whiteUser, blackUser, game.gameName(), game.game());
+                    this.service.saveGame(newGame);
+                    this.connectionManager.leaveGame(session, user, gameId);
                     break;
                 case RESIGN:
                     System.out.println("Resign");
