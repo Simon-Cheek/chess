@@ -94,16 +94,21 @@ public class Client {
         if (this.username.isEmpty()) { throw new RuntimeException("Not logged in"); }
         if (this.currentGame == null) { throw new RuntimeException("Not in a game"); }
         if (this.currentGame.game().isFinished()) { throw new RuntimeException("Game is finished"); }
-        if (params.length != 4) { throw new RuntimeException("Invalid Argument Length"); }
+        if (params.length != 4 && params.length != 3) { throw new RuntimeException("Invalid Argument Length"); }
         if (!params[0].equals("move")) { throw new RuntimeException("Invalid command."); }
-        params[3] = params[3].toLowerCase();
-        ChessPiece.PieceType piece = switch (params[3]) {
-            case "queen" -> ChessPiece.PieceType.QUEEN;
-            case "bishop" -> ChessPiece.PieceType.BISHOP;
-            case "rook" -> ChessPiece.PieceType.ROOK;
-            case "knight" -> ChessPiece.PieceType.KNIGHT;
-            default -> null;
-        };
+        ChessPiece.PieceType piece;
+        if (params.length == 4) {
+            params[3] = params[3].toLowerCase();
+            piece = switch (params[3]) {
+                case "queen" -> ChessPiece.PieceType.QUEEN;
+                case "bishop" -> ChessPiece.PieceType.BISHOP;
+                case "rook" -> ChessPiece.PieceType.ROOK;
+                case "knight" -> ChessPiece.PieceType.KNIGHT;
+                default -> null;
+            };
+        } else {
+            piece = null;
+        }
         ChessMove move = MoveGenerator.getMove(params[1], params[2], piece);
         this.webSocketFacade.makeMove(this.authToken, this.currentGame.gameID(), move);
         return "Successfully made move";

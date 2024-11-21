@@ -38,8 +38,8 @@ public class WebSocketHandler {
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws IOException {
-        UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
         try {
+            UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
             AuthRecord auth = this.service.verifyUser(command.getAuthToken());
             String user = auth.username();
             int gameId = command.getGameID();
@@ -61,8 +61,10 @@ public class WebSocketHandler {
                     this.service.saveGame(game);
                     this.connectionManager.makeMove(session, user, game, move);
                 case LEAVE:
-                    String whiteUser = game.whiteUsername().equals(user) ? null : game.whiteUsername();
-                    String blackUser = game.blackUsername().equals(user) ? null : game.blackUsername();
+                    String whiteUser = game.whiteUsername() != null &&
+                            game.whiteUsername().equals(user) ? null : game.whiteUsername();
+                    String blackUser = game.blackUsername() != null &&
+                            game.blackUsername().equals(user) ? null : game.blackUsername();
                     GameRecord newGame = new GameRecord(gameId, whiteUser, blackUser, game.gameName(), game.game());
                     this.service.saveGameRecord(newGame);
                     this.connectionManager.leaveGame(session, user, gameId);

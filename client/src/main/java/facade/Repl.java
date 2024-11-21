@@ -41,13 +41,17 @@ public class Repl implements NotificationHandler {
         switch (message.getServerMessageType()) {
             case NOTIFICATION:
                 System.out.println(this.wrapInYellow(message.getMessage()));
+                break;
             case ERROR:
                 System.out.println(this.wrapInYellow(message.getErrorMessage()));
+                break;
             case LOAD_GAME:
                 this.client.refreshGame(message.getGame());
+                break;
             default:
                 System.out.println("Unexpected msg from WS");
         }
+        this.printPrompt();
     }
 
     private void printPrompt() {

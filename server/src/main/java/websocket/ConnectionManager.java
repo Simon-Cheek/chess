@@ -68,9 +68,11 @@ public class ConnectionManager {
         // NOTIFICATION to everyone except the session holder
         ServerMessage notifyMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
         notifyMessage.setMessage(this.craftMoveMessage(userName, move));
-        for (Connection conn : connections) {
-            if (!conn.session.equals(session)) {
-                conn.send(new Gson().toJson(notifyMessage));
+        if (!connections.isEmpty()) {
+            for (Connection conn : connections) {
+                if (!conn.session.equals(session)) {
+                    conn.send(new Gson().toJson(notifyMessage));
+                }
             }
         }
 
@@ -82,14 +84,16 @@ public class ConnectionManager {
         // Send NOTIFICATION to all other connections in that game
         ServerMessage serverMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
         String action = " as an observer.";
-        if (game.whiteUsername().equals(userName)) { action = " as player White."; }
-        if (game.blackUsername().equals(userName)) { action = " as player Black."; }
+        if (game.whiteUsername() != null && game.whiteUsername().equals(userName)) { action = " as player White."; }
+        if (game.blackUsername() != null && game.blackUsername().equals(userName)) { action = " as player Black."; }
         serverMessage.setMessage(String.format("%s joined the game %s", userName, action));
         this.connections.computeIfAbsent(gameId, key -> new ArrayList<Connection>());
 
         ArrayList<Connection> gameConnections = this.connections.get(gameId);
-        for (Connection con : gameConnections) {
-            if (con.session.isOpen()) { con.send(new Gson().toJson(serverMessage)); }
+        if (!gameConnections.isEmpty()) {
+            for (Connection con : gameConnections) {
+                if (con.session.isOpen()) { con.send(new Gson().toJson(serverMessage)); }
+            }
         }
 
         // Add existing user connection

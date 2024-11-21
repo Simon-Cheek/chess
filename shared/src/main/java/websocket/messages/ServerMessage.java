@@ -23,7 +23,11 @@ public class ServerMessage {
     }
 
     public ServerMessage(ServerMessageType type) {
+
         this.serverMessageType = type;
+        this.message = "";
+        this.errorMessage = "";
+        this.game = null;
     }
 
     public ServerMessageType getServerMessageType() {
