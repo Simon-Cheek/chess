@@ -55,20 +55,36 @@ public class Client {
             default -> HelpInfo.help(this.isLoggedIn(), this.isInGame());
         };
     }
+    public String postGameStatus() {
+
+        String result = "\n";
+        if (this.currentGame.game().isFinished()) {
+            ChessGame.TeamColor color = this.currentGame.game().getWinningColor();
+            if (color.equals(ChessGame.TeamColor.WHITE)) {
+                result += ("White wins!\n");
+            } else if (color.equals(ChessGame.TeamColor.BLACK)) {
+                result += ("Black wins!\n");
+            } else {
+                result += ("Stalemate!\n");
+            }
+        } else {
+            if (this.currentGame.game().isInCheck(ChessGame.TeamColor.WHITE)) {
+                result += ("White is in Check!\n");
+            }
+            if (this.currentGame.game().isInCheck(ChessGame.TeamColor.BLACK)) {
+                result += ("Black is in Check!\n");
+            }
+            if (this.currentGame.game().getTeamTurn() == ChessGame.TeamColor.WHITE) {
+                result += ("It is White's turn!\n");
+            } else {
+                result += ("It is Black's turn!\n");
+        }}
+        return result;
+    }
 
     public void refreshGame(GameRecord game) {
         this.currentGame = game;
         System.out.println(this.redrawGame());
-        if (this.currentGame.game().isFinished()) {
-            ChessGame.TeamColor color = this.currentGame.game().getWinningColor();
-            if (color.equals(ChessGame.TeamColor.WHITE)) {
-                System.out.println("White wins!");
-            } else if (color.equals(ChessGame.TeamColor.BLACK)) {
-                System.out.println("Black wins!");
-            } else {
-                System.out.println("Stalemate!");
-            }
-        }
     }
 
     public String highlightBoard(String[] params) {
@@ -126,9 +142,9 @@ public class Client {
         if (this.username.isEmpty()) { throw new RuntimeException("Not logged in"); }
         if (this.currentGame == null) { throw new RuntimeException("Not in a game"); }
         if (this.currentGame.blackUsername() != null && this.currentGame.blackUsername().equals(this.username)) {
-            return BoardBuilder.buildBlackBoard(this.currentGame.game(), null);
+            return BoardBuilder.buildBlackBoard(this.currentGame.game(), null) + this.postGameStatus();
         } else {
-            return BoardBuilder.buildWhiteBoard(this.currentGame.game(), null);
+            return BoardBuilder.buildWhiteBoard(this.currentGame.game(), null) + this.postGameStatus();
         }
     }
 
@@ -157,13 +173,10 @@ public class Client {
         String statement =
                 String.format("Successfully joined game %d) %s\n", gameInfo.gameNumber(), gameInfo.gameName());
         GameRecord gameRecord = this.games.get(gameInfo.gameNumber() - 1);
-        ChessGame game = gameRecord.game();
         this.currentGame = gameRecord;
-
         this.webSocketFacade.connectToGame(this.authToken, gameRecord.gameID());
 
-        return statement + BoardBuilder.buildWhiteBoard(game, null) +
-                BoardBuilder.buildBlackBoard(game, null) + "\n" + HelpInfo.help(this.isLoggedIn(), this.isInGame());
+        return statement + "\n" + HelpInfo.help(this.isLoggedIn(), this.isInGame());
     }
 
     public String listGames() {

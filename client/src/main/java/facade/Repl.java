@@ -1,6 +1,6 @@
 package facade;
 
-import ui.BoardBuilder;
+import helpers.HelpInfo;
 import ui.EscapeSequences;
 import websocket.NotificationHandler;
 import websocket.messages.ServerMessage;
@@ -17,6 +17,7 @@ public class Repl implements NotificationHandler {
 
     public void run() {
         System.out.println("Welcome to Chess!");
+        System.out.println(HelpInfo.help(false, false));
 
         Scanner scanner = new Scanner(System.in);
         var result = "";
