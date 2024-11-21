@@ -32,6 +32,17 @@ public class ConnectionManager {
         return userName + " moved from " + startPos + " to " + endPos;
     }
 
+    public void resignGame(String userName, int gameId) throws IOException {
+
+        ServerMessage message = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
+        message.setMessage(userName + " resigned the game.");
+
+        ArrayList<Connection> connections = this.connections.get(gameId);
+        for (Connection conn : connections) {
+            conn.send(new Gson().toJson(message));
+        }
+    }
+
     public void leaveGame(Session session, String userName, int gameId) throws IOException {
 
         // Remove Session from Game Connection List

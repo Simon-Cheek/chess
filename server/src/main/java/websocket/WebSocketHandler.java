@@ -3,7 +3,6 @@ package websocket;
 import chess.ChessGame;
 import chess.ChessMove;
 import com.google.gson.Gson;
-import exception.ResponseException;
 import model.AuthRecord;
 import model.GameRecord;
 import org.eclipse.jetty.websocket.api.Session;
@@ -17,8 +16,8 @@ import java.io.IOException;
 @WebSocket
 public class WebSocketHandler {
 
-    private ConnectionManager connectionManager;
-    private Service service;
+    private final ConnectionManager connectionManager;
+    private final Service service;
 
     public WebSocketHandler() {
         this.connectionManager = new ConnectionManager();
@@ -56,6 +55,7 @@ public class WebSocketHandler {
                     if (!this.verifyPlayerMove(game, user)) {
                         throw new RuntimeException("Invalid Player");
                     }
+                    if (game.game().isFinished()) { throw new RuntimeException("Game is over!"); }
                     if (move == null) { throw new RuntimeException("No Move"); }
                     game.game().makeMove(move);
                     this.service.saveGame(game);
@@ -68,10 +68,15 @@ public class WebSocketHandler {
                     this.connectionManager.leaveGame(session, user, gameId);
                     break;
                 case RESIGN:
-                    System.out.println("Resign");
+                    if (game.whiteUsername().equals(user)) { game.game().setWinningColor(ChessGame.TeamColor.BLACK); }
+                     else if (game.blackUsername().equals(user)) {
+                         game.game().setWinningColor(ChessGame.TeamColor.WHITE);
+                     } else { throw new RuntimeException("Not a player"); }
+                    game.game().setFinished(true);
+                     this.connectionManager.resignGame(user, gameId);
                     break;
                 default:
-                    System.out.println("Default");
+                    throw new RuntimeException("Invalid Command");
             }
         } catch (Exception e) {
             this.sendError(session, e.getMessage());

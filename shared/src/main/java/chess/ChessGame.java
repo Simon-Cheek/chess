@@ -13,11 +13,29 @@ public class ChessGame {
 
     private TeamColor teamColor;
     private ChessBoard board;
+    private boolean finished;
+    private TeamColor winningColor;
 
     public ChessGame() {
         this.teamColor = TeamColor.WHITE; // Initialize turn to White
         this.board = new ChessBoard();
         this.board.resetBoard(); // Create new board and initialize to new game
+    }
+
+    public boolean isFinished() {
+        return this.finished;
+    }
+
+    public TeamColor getWinningColor() {
+        return this.winningColor;
+    }
+
+    public void setFinished(boolean value) {
+        this.finished = value;
+    }
+
+    public void setWinningColor(TeamColor color) {
+        this.winningColor = color;
     }
 
     /**
@@ -118,6 +136,22 @@ public class ChessGame {
 
         // Change turn
         this.setTeamTurn(this.getTeamTurn() == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE);
+
+        // Check for Checkmate
+        if (this.isInCheckmate(TeamColor.WHITE)) {
+            this.finished = true;
+            this.winningColor = TeamColor.BLACK;
+        }
+        if (this.isInCheckmate(TeamColor.BLACK)) {
+            this.finished = true;
+            this.winningColor = TeamColor.WHITE;
+        }
+
+        // Check for Stalemate
+        if (this.isInStalemate(TeamColor.WHITE) || this.isInStalemate(TeamColor.BLACK)) {
+            this.finished = true;
+            this.winningColor = null;
+        }
     }
 
     private boolean isInDangerHelper(ChessPosition position, ChessPiece newPiece, ChessPosition newPosition) {
