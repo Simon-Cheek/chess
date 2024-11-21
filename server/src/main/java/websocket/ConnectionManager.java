@@ -39,7 +39,7 @@ public class ConnectionManager {
 
         ArrayList<Connection> connections = this.connections.get(gameId);
         for (Connection conn : connections) {
-            conn.send(new Gson().toJson(message));
+            if (conn.session.isOpen()) { conn.send(new Gson().toJson(message)); }
         }
     }
 
@@ -48,11 +48,12 @@ public class ConnectionManager {
         // Remove Session from Game Connection List
         ArrayList<Connection> connections = this.connections.get(gameId);
         connections.removeIf((conn) -> conn.session.equals(session));
+        connections.removeIf((conn) -> conn.userName.equals(userName));
         // Send NOTIFY to remaining Sessions
         ServerMessage notifyMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
         notifyMessage.setMessage(userName + " has left the game.");
         for (Connection conn : connections) {
-            conn.send(new Gson().toJson(notifyMessage));
+            if (conn.session.isOpen()) { conn.send(new Gson().toJson(notifyMessage)); }
         }
     }
 
@@ -63,14 +64,14 @@ public class ConnectionManager {
         loadMessage.setGame(game);
         ArrayList<Connection> connections = this.connections.get(game.gameID());
         for (Connection conn : connections) {
-            conn.send(new Gson().toJson(loadMessage));
+            if (conn.session.isOpen()) { conn.send(new Gson().toJson(loadMessage)); }
         }
         // NOTIFICATION to everyone except the session holder
         ServerMessage notifyMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
         notifyMessage.setMessage(this.craftMoveMessage(userName, move));
         if (!connections.isEmpty()) {
             for (Connection conn : connections) {
-                if (!conn.session.equals(session)) {
+                if (!conn.session.equals(session) && conn.session.isOpen()) {
                     conn.send(new Gson().toJson(notifyMessage));
                 }
             }
@@ -104,13 +105,5 @@ public class ConnectionManager {
         ServerMessage sMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME);
         sMessage.setGame(game);
         newConnection.send(new Gson().toJson(sMessage));
-    }
-
-    // Removes ALL connections of a user from a given game
-    public void removeConnection(String userName, int gameId) {
-        ArrayList<Connection> gameCons = this.connections.get(gameId);
-        if (gameCons != null && !gameCons.isEmpty()) {
-            gameCons.removeIf(conn -> conn.userName.equals(userName));
-        }
     }
 }

@@ -26,6 +26,7 @@ public class WebSocketHandler {
     }
 
     private void sendError(Session session, String msg) throws IOException {
+        System.out.println("About to send ERROR");
         ServerMessage errorMsg = new ServerMessage(ServerMessage.ServerMessageType.ERROR);
         errorMsg.setErrorMessage("Error: " + msg);
 
@@ -44,6 +45,7 @@ public class WebSocketHandler {
     public void onMessage(Session session, String message) throws IOException {
         try {
             UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
+            System.out.println("Incoming Command Type: " + command.getCommandType());
             AuthRecord auth = this.service.verifyUser(command.getAuthToken());
             String user = auth.username();
             int gameId = command.getGameID();
@@ -64,6 +66,7 @@ public class WebSocketHandler {
                     game.game().makeMove(move);
                     this.service.saveGame(game);
                     this.connectionManager.makeMove(session, user, game, move);
+                    break;
                 case LEAVE:
                     String whiteUser = game.whiteUsername() != null &&
                             game.whiteUsername().equals(user) ? null : game.whiteUsername();
@@ -74,11 +77,15 @@ public class WebSocketHandler {
                     this.connectionManager.leaveGame(session, user, gameId);
                     break;
                 case RESIGN:
-                    if (game.whiteUsername().equals(user)) { game.game().setWinningColor(ChessGame.TeamColor.BLACK); }
-                     else if (game.blackUsername().equals(user)) {
+                    if (game.game().isFinished()) { throw new RuntimeException("Game is already over!"); }
+                    if (game.whiteUsername() != null && game.whiteUsername().equals(user)) {
+                        game.game().setWinningColor(ChessGame.TeamColor.BLACK);
+                    }
+                     else if (game.blackUsername() != null && game.blackUsername().equals(user)) {
                          game.game().setWinningColor(ChessGame.TeamColor.WHITE);
                      } else { throw new RuntimeException("Not a player"); }
                     game.game().setFinished(true);
+                     this.service.saveGame(game);
                      this.connectionManager.resignGame(user, gameId);
                     break;
                 default:
