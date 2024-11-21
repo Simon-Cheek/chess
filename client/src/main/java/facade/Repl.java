@@ -1,5 +1,6 @@
 package facade;
 
+import ui.BoardBuilder;
 import ui.EscapeSequences;
 import websocket.NotificationHandler;
 import websocket.messages.ServerMessage;
@@ -32,7 +33,22 @@ public class Repl implements NotificationHandler {
         }
     }
 
-    public void notify(ServerMessage message) {}
+    public String wrapInYellow(String s) {
+        return EscapeSequences.SET_TEXT_COLOR_YELLOW + s + EscapeSequences.RESET_TEXT_COLOR;
+    }
+
+    public void notify(ServerMessage message) {
+        switch (message.getServerMessageType()) {
+            case NOTIFICATION:
+                System.out.println(this.wrapInYellow(message.getMessage()));
+            case ERROR:
+                System.out.println(this.wrapInYellow(message.getErrorMessage()));
+            case LOAD_GAME:
+                this.client.refreshGame(message.getGame());
+            default:
+                System.out.println("Unexpected msg from WS");
+        }
+    }
 
     private void printPrompt() {
         System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);

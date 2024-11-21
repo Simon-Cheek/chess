@@ -56,6 +56,21 @@ public class Client {
         };
     }
 
+    public void refreshGame(GameRecord game) {
+        this.currentGame = game;
+        System.out.println(this.redrawGame());
+        if (this.currentGame.game().isFinished()) {
+            ChessGame.TeamColor color = this.currentGame.game().getWinningColor();
+            if (color.equals(ChessGame.TeamColor.WHITE)) {
+                System.out.println("White wins!");
+            } else if (color.equals(ChessGame.TeamColor.BLACK)) {
+                System.out.println("Black wins!");
+            } else {
+                System.out.println("Stalemate!");
+            }
+        }
+    }
+
     public String highlightBoard(String[] params) {
 
         if (params.length == 0) { throw new RuntimeException("Must supply a position"); }
