@@ -1,10 +1,12 @@
 package facade;
 
 import ui.EscapeSequences;
+import websocket.NotificationHandler;
+import websocket.messages.ServerMessage;
 
 import java.util.Scanner;
 
-public class Repl {
+public class Repl implements NotificationHandler {
 
     private Client client;
 
@@ -29,6 +31,8 @@ public class Repl {
             System.out.println();
         }
     }
+
+    public void notify(ServerMessage message) {}
 
     private void printPrompt() {
         System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);

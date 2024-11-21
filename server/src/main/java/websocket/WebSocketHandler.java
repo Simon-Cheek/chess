@@ -25,7 +25,7 @@ public class WebSocketHandler {
     }
 
     private void sendError(Session session, String msg) throws IOException {
-        session.getRemote().sendString(String.format("Error: %s", msg));
+        session.getRemote().sendString(String.format("Error : %s", msg));
     }
 
     private boolean verifyPlayerMove(GameRecord game, String user) {
