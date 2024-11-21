@@ -52,6 +52,12 @@ public class DBGameDAO {
         ExecuteUpdate.executeUpdate(statement, new Gson().toJson(game.game()), gameId);
     }
 
+    public void persistGameRecord(GameRecord game) throws ResponseException {
+        String statement = "UPDATE gameData SET game = ?, whiteUsername = ?, blackUsername = ? WHERE id = ?";
+        ExecuteUpdate.executeUpdate(
+                statement, new Gson().toJson(game.game()), game.whiteUsername(), game.blackUsername(), game.gameID());
+    }
+
 
     public ArrayList<GameRecord> getAllGames() throws ResponseException {
         ArrayList<GameRecord> allGames = new ArrayList<GameRecord>();

@@ -61,7 +61,7 @@ public class Client {
         if (params.length == 0) { throw new RuntimeException("Must supply a position"); }
         ChessPosition pos = MoveGenerator.getPosition(params[0]);
 
-        if (this.currentGame.blackUsername().equals(this.username)) {
+        if (this.currentGame.blackUsername() != null && this.currentGame.blackUsername().equals(this.username)) {
             return BoardBuilder.buildBlackBoard(this.currentGame.game(), pos);
         } else {
             return BoardBuilder.buildWhiteBoard(this.currentGame.game(), pos);
@@ -105,7 +105,7 @@ public class Client {
     public String redrawGame() {
         if (this.username.isEmpty()) { throw new RuntimeException("Not logged in"); }
         if (this.currentGame == null) { throw new RuntimeException("Not in a game"); }
-        if (this.currentGame.blackUsername().equals(this.username)) {
+        if (this.currentGame.blackUsername() != null && this.currentGame.blackUsername().equals(this.username)) {
             return BoardBuilder.buildBlackBoard(this.currentGame.game(), null);
         } else {
             return BoardBuilder.buildWhiteBoard(this.currentGame.game(), null);

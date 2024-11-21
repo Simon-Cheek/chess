@@ -64,7 +64,7 @@ public class WebSocketHandler {
                     String whiteUser = game.whiteUsername().equals(user) ? null : game.whiteUsername();
                     String blackUser = game.blackUsername().equals(user) ? null : game.blackUsername();
                     GameRecord newGame = new GameRecord(gameId, whiteUser, blackUser, game.gameName(), game.game());
-                    this.service.saveGame(newGame);
+                    this.service.saveGameRecord(newGame);
                     this.connectionManager.leaveGame(session, user, gameId);
                     break;
                 case RESIGN:

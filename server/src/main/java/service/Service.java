@@ -102,6 +102,10 @@ public class Service {
         this.gameDAO.persistGame(game);
     }
 
+    public void saveGameRecord(GameRecord game) throws ResponseException {
+        this.gameDAO.persistGameRecord(game);
+    }
+
     // Logs user out on existing session
     public void logoutUser(String authToken) throws ResponseException {
         this.verifyUser(authToken);
