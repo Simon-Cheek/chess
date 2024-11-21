@@ -1,29 +1,36 @@
 package facade;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPiece;
+import helpers.MoveGenerator;
 import ui.BoardBuilder;
 import helpers.HelpInfo;
 import helpers.ResponseObject;
 import model.AuthRecord;
 import model.GameRecord;
 import ui.EscapeSequences;
+import websocket.NotificationHandler;
+import websocket.WebSocketFacade;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Objects;
 
 public class Client {
 
     private String authToken;
     private String username;
     private final ServerFacade serverFacade;
+    private final WebSocketFacade webSocketFacade;
     private ArrayList<GameRecord> games;
-    boolean isInGame;
+    private GameRecord currentGame;
 
-    public Client() {
+    public Client(NotificationHandler handler) {
         this.username = "";
         this.authToken = "";
         this.serverFacade = new ServerFacade();
-        this.isInGame = false;
+        this.webSocketFacade = new WebSocketFacade("http://localhost:8080", handler);
     }
 
     public String parse(String input) {
@@ -39,8 +46,57 @@ public class Client {
             case "list" -> this.listGames();
             case "join" -> this.joinGame(params);
             case "observe" -> this.observeGame(params);
-            default -> HelpInfo.help(this.isLoggedIn(), this.isInGame);
+            case "redraw" -> this.redrawGame();
+            case "leave" -> this.leaveGame();
+            case "make" -> this.makeMove(params);
+            case "resign" -> this.resignGame();
+            case "highlight" -> "highlight";
+            default -> HelpInfo.help(this.isLoggedIn(), this.isInGame());
         };
+    }
+
+    public String resignGame() {
+        if (this.username.isEmpty()) { throw new RuntimeException("Not logged in"); }
+        if (this.currentGame == null) { throw new RuntimeException("Not in a game"); }
+        this.webSocketFacade.resignGame(this.authToken, this.currentGame.gameID());
+        return "Successfully resigned";
+    }
+
+    public String makeMove(String[] params) {
+        if (this.username.isEmpty()) { throw new RuntimeException("Not logged in"); }
+        if (this.currentGame == null) { throw new RuntimeException("Not in a game"); }
+        if (this.currentGame.game().isFinished()) { throw new RuntimeException("Game is finished"); }
+        if (params.length != 4) { throw new RuntimeException("Invalid Argument Length"); }
+        if (!params[0].equals("move")) { throw new RuntimeException("Invalid command."); }
+        params[3] = params[3].toLowerCase();
+        ChessPiece.PieceType piece = switch (params[3]) {
+            case "queen" -> ChessPiece.PieceType.QUEEN;
+            case "bishop" -> ChessPiece.PieceType.BISHOP;
+            case "rook" -> ChessPiece.PieceType.ROOK;
+            case "knight" -> ChessPiece.PieceType.KNIGHT;
+            default -> null;
+        };
+        ChessMove move = MoveGenerator.getMove(params[1], params[2], piece);
+        this.webSocketFacade.makeMove(this.authToken, this.currentGame.gameID(), move);
+        return "Successfully made move";
+    }
+
+    public String leaveGame() {
+        if (this.username.isEmpty()) { throw new RuntimeException("Not logged in"); }
+        if (this.currentGame == null) { throw new RuntimeException("Not in a game"); }
+        this.webSocketFacade.leaveGame(this.authToken, this.currentGame.gameID());
+        this.currentGame = null;
+        return "Successfully left the game.";
+    }
+
+    public String redrawGame() {
+        if (this.username.isEmpty()) { throw new RuntimeException("Not logged in"); }
+        if (this.currentGame == null) { throw new RuntimeException("Not in a game"); }
+        if (this.currentGame.blackUsername().equals(this.username)) {
+            return BoardBuilder.buildBlackBoard(this.currentGame.game(), null);
+        } else {
+            return BoardBuilder.buildWhiteBoard(this.currentGame.game(), null);
+        }
     }
 
     public String observeGame(String[] params) {
@@ -48,7 +104,7 @@ public class Client {
         ClientGameInfo gameInfo = this.getGameInfo(params[0]);
         String statement = String.format("Observing Game %d) %s\n", gameInfo.gameNumber(), gameInfo.gameName());
         ChessGame game = this.games.get(gameInfo.gameNumber() - 1).game();
-        return statement + BoardBuilder.buildWhiteBoard(game) + BoardBuilder.buildBlackBoard(game);
+        return statement + BoardBuilder.buildWhiteBoard(game, null) + BoardBuilder.buildBlackBoard(game, null);
     }
 
 
@@ -67,9 +123,14 @@ public class Client {
         AuthClient.joinGame(this.serverFacade, this.authToken, color, gameInfo.gameId());
         String statement =
                 String.format("Successfully joined game %d) %s\n", gameInfo.gameNumber(), gameInfo.gameName());
-        ChessGame game = this.games.get(gameInfo.gameNumber() - 1).game();
-        this.isInGame = true;
-        return statement + BoardBuilder.buildWhiteBoard(game) + BoardBuilder.buildBlackBoard(game);
+        GameRecord gameRecord = this.games.get(gameInfo.gameNumber() - 1);
+        ChessGame game = gameRecord.game();
+        this.currentGame = gameRecord;
+
+        this.webSocketFacade.connectToGame(this.authToken, gameRecord.gameID());
+
+        return statement + BoardBuilder.buildWhiteBoard(game, null) +
+                BoardBuilder.buildBlackBoard(game, null) + "\n" + HelpInfo.help(this.isLoggedIn(), this.isInGame());
     }
 
     public String listGames() {
@@ -99,6 +160,7 @@ public class Client {
         String res = AuthClient.logout(this.serverFacade, this.authToken);
         this.authToken = "";
         this.username = "";
+        this.currentGame = null;
         return res;
     }
 
@@ -110,7 +172,7 @@ public class Client {
         } else {
             ResponseObject res = serverFacade.loginUser(params[0], params[1]);
             if (res.statusCode() == 200) {
-                return this.setLogin(res);
+                return this.setLogin(res) + "\n" + HelpInfo.help(this.isLoggedIn(), this.isInGame());
             }
             switch (res.statusCode()) {
                 case 400 -> throw new RuntimeException("Bad Request");
@@ -157,6 +219,10 @@ public class Client {
             throw new RuntimeException("Invalid ID or No Games. List Games to view IDs.");
         }
         return new ClientGameInfo(gameNumber, gameId, gameName);
+    }
+
+    private boolean isInGame() {
+        return this.currentGame != null;
     }
 
     private String setLogin(ResponseObject res) {

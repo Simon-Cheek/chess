@@ -1,6 +1,8 @@
 package websocket;
 
+import chess.ChessMove;
 import com.google.gson.Gson;
+import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 
 import javax.websocket.*;
@@ -35,5 +37,34 @@ public class WebSocketFacade extends Endpoint {
 
     @Override
     public void onOpen(Session session, EndpointConfig config) {}
+
+    public void connectToGame(String authToken, int gameId) {
+        try {
+            UserGameCommand command = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameId);
+            this.session.getBasicRemote().sendText(new Gson().toJson(command));
+        } catch (Exception e) { throw new RuntimeException(e.getMessage()); }
+    }
+
+    public void leaveGame(String authToken, int gameId) {
+        try {
+            UserGameCommand command = new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameId);
+            this.session.getBasicRemote().sendText(new Gson().toJson(command));
+        } catch (Exception e) { throw new RuntimeException(e.getMessage()); }
+    }
+
+    public void makeMove(String authToken, int gameId, ChessMove move) {
+        try {
+            UserGameCommand command = new UserGameCommand(UserGameCommand.CommandType.MAKE_MOVE, authToken, gameId);
+            command.setMove(move);
+            this.session.getBasicRemote().sendText(new Gson().toJson(command));
+        } catch (Exception e) { throw new RuntimeException(e.getMessage()); }
+    }
+
+    public void resignGame(String authToken, int gameId) {
+        try {
+            UserGameCommand command = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameId);
+            this.session.getBasicRemote().sendText(new Gson().toJson(command));
+        } catch (Exception e) { throw new RuntimeException(e.getMessage()); }
+    }
 
 }

@@ -11,7 +11,7 @@ public class Repl implements NotificationHandler {
     private Client client;
 
     public Repl() {
-        this.client = new Client();
+        this.client = new Client(this);
     }
 
     public void run() {

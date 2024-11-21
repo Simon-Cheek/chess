@@ -13,7 +13,7 @@ public class BoardBuilder {
     static String reset = EscapeSequences.RESET_TEXT_COLOR;
 
 
-    public static String buildBlackBoard(ChessGame game) {
+    public static String buildBlackBoard(ChessGame game, ChessPosition pos) {
 
         StringBuilder blackBoard = new StringBuilder();
         blackBoard.append("Chess Board: Black Perspective\n");
@@ -33,7 +33,7 @@ public class BoardBuilder {
         return blackBoard.toString();
     }
 
-    public static String buildWhiteBoard(ChessGame game) {
+    public static String buildWhiteBoard(ChessGame game, ChessPosition pos) {
 
         StringBuilder whiteBoard = new StringBuilder();
         whiteBoard.append("Chess Board: White Perspective\n");

@@ -49,7 +49,8 @@ public class HelpInfo {
                 %s redraw %s- the chess board
                 %s leave %s- the game
                 %s resign %s- the game
-                %s make move <START_POS> <END_POS> %s- a game
+                %s make move <START_POS> <END_POS> <OPTIONAL: Promotion Piece> %s- in the game
+                ( Position being expressed as <Column><Row> ex: 'a3' )
                 %s highlight <POS> %s- moves for given piece
                 %s help %s- with possible commands
                 """, EscapeSequences.SET_TEXT_COLOR_BLUE,
