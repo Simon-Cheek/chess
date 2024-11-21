@@ -3,6 +3,7 @@ package facade;
 import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPiece;
+import chess.ChessPosition;
 import helpers.MoveGenerator;
 import ui.BoardBuilder;
 import helpers.HelpInfo;
@@ -50,9 +51,21 @@ public class Client {
             case "leave" -> this.leaveGame();
             case "make" -> this.makeMove(params);
             case "resign" -> this.resignGame();
-            case "highlight" -> "highlight";
+            case "highlight" -> this.highlightBoard(params);
             default -> HelpInfo.help(this.isLoggedIn(), this.isInGame());
         };
+    }
+
+    public String highlightBoard(String[] params) {
+
+        if (params.length == 0) { throw new RuntimeException("Must supply a position"); }
+        ChessPosition pos = MoveGenerator.getPosition(params[0]);
+
+        if (this.currentGame.blackUsername().equals(this.username)) {
+            return BoardBuilder.buildBlackBoard(this.currentGame.game(), pos);
+        } else {
+            return BoardBuilder.buildWhiteBoard(this.currentGame.game(), pos);
+        }
     }
 
     public String resignGame() {

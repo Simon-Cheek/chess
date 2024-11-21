@@ -1,9 +1,10 @@
 package ui;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class BoardBuilder {
 
@@ -13,7 +14,33 @@ public class BoardBuilder {
     static String reset = EscapeSequences.RESET_TEXT_COLOR;
 
 
+    public static ArrayList<int[]> getHighlights(ChessGame game, ChessPosition pos) {
+        ArrayList<int[]> hSquares = new ArrayList<int[]>();
+        if (pos != null) {
+            Collection<ChessMove> validMoves = game.validMoves(pos);
+            for (ChessMove move : validMoves) {
+                ChessPosition end = move.getEndPosition();
+                hSquares.add(new int[]{end.getRow(), end.getColumn()});
+            }
+        }
+        return hSquares;
+    }
+
+    public static boolean checkHighlight(ArrayList<int[]> squares, int row, int col) {
+        if (squares.isEmpty()) { return false; }
+        for (int[] coord : squares) {
+            if (coord[0] == row && coord[1] == col) { return true; }
+        }
+        return false;
+    }
+
+
     public static String buildBlackBoard(ChessGame game, ChessPosition pos) {
+
+        ArrayList<int[]> hSquares = new ArrayList<int[]>();
+        if (pos != null) {
+            hSquares = getHighlights(game, pos);
+        }
 
         StringBuilder blackBoard = new StringBuilder();
         blackBoard.append("Chess Board: Black Perspective\n");
@@ -22,6 +49,8 @@ public class BoardBuilder {
             blackBoard.append(text).append(row).append(reset).append(" ");
             for (int col = 8; col >= 1; col--) {
                 String bgColor = (row + col) % 2 == 0 ? dark: light;
+                boolean shouldHighlight = checkHighlight(hSquares, row, col);
+                if (shouldHighlight) { bgColor = EscapeSequences.SET_BG_COLOR_BLUE; }
                 String piece = getPiece(game, row, col);
                 blackBoard.append(bgColor).append(" ").append(piece).append(" ");
             }
@@ -35,6 +64,11 @@ public class BoardBuilder {
 
     public static String buildWhiteBoard(ChessGame game, ChessPosition pos) {
 
+        ArrayList<int[]> hSquares = new ArrayList<int[]>();
+        if (pos != null) {
+            hSquares = getHighlights(game, pos);
+        }
+
         StringBuilder whiteBoard = new StringBuilder();
         whiteBoard.append("Chess Board: White Perspective\n");
         whiteBoard.append(text).append("    h    g    f    e    d    c    b    a\n").append(reset);
@@ -42,6 +76,8 @@ public class BoardBuilder {
             whiteBoard.append(text).append(row).append(reset).append(" ");
             for (int col = 1; col <= 8; col++) {
                 String bgColor = (row + col) % 2 == 0 ? dark: light;
+                boolean shouldHighlight = checkHighlight(hSquares, row, col);
+                if (shouldHighlight) { bgColor = EscapeSequences.SET_BG_COLOR_BLUE; }
                 String piece = getPiece(game, row, col);
                 whiteBoard.append(bgColor).append(" ").append(piece).append(" ");
             }
