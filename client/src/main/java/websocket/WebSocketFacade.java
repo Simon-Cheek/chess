@@ -2,7 +2,6 @@ package websocket;
 
 import chess.ChessMove;
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 
@@ -27,6 +26,7 @@ public class WebSocketFacade extends Endpoint {
                 @Override
                 public void onMessage(String message) {
                     try {
+                        System.out.println("Received a Message.");
                         ServerMessage msg = new Gson().fromJson(message, ServerMessage.class);
                         notificationHandler.notify(msg);
                     } catch (Exception e) {

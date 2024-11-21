@@ -11,10 +11,10 @@ import java.util.Objects;
  * methods.
  */
 public class ServerMessage {
-    ServerMessageType serverMessageType;
-    String message;
-    String errorMessage;
-    GameRecord game;
+    private ServerMessageType serverMessageType;
+    private String message;
+    private String errorMessage;
+    private GameRecord game;
 
     public enum ServerMessageType {
         LOAD_GAME,
@@ -25,8 +25,8 @@ public class ServerMessage {
     public ServerMessage(ServerMessageType type) {
 
         this.serverMessageType = type;
-        this.message = "";
-        this.errorMessage = "";
+        this.message = null;
+        this.errorMessage = null;
         this.game = null;
     }
 
@@ -73,5 +73,15 @@ public class ServerMessage {
     @Override
     public int hashCode() {
         return Objects.hash(getServerMessageType());
+    }
+
+    @Override
+    public String toString() {
+        return "ServerMessage{" +
+                "serverMessageType=" + serverMessageType +
+                ", message='" + message + '\'' +
+                ", errorMessage='" + errorMessage + '\'' +
+                ", game=" + game +
+                '}';
     }
 }

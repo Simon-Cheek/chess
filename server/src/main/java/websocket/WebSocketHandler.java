@@ -10,6 +10,7 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import service.Service;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ServerMessage;
 
 import java.io.IOException;
 
@@ -25,7 +26,10 @@ public class WebSocketHandler {
     }
 
     private void sendError(Session session, String msg) throws IOException {
-        session.getRemote().sendString(String.format("Error : %s", msg));
+        ServerMessage errorMsg = new ServerMessage(ServerMessage.ServerMessageType.ERROR);
+        errorMsg.setErrorMessage("Error: " + msg);
+
+        session.getRemote().sendString(new Gson().toJson(errorMsg));
     }
 
     private boolean verifyPlayerMove(GameRecord game, String user) {
