@@ -36,9 +36,9 @@ public class WebSocketHandler {
     private boolean verifyPlayerMove(GameRecord game, String user) {
         ChessGame.TeamColor currentColor = game.game().getTeamTurn();
         if (currentColor == ChessGame.TeamColor.WHITE) {
-            return game.whiteUsername().equals(user);
+            return game.whiteUsername() != null && game.whiteUsername().equals(user);
         }
-        return game.blackUsername().equals(user);
+        return game.blackUsername() != null && game.blackUsername().equals(user);
     }
 
     @OnWebSocketMessage

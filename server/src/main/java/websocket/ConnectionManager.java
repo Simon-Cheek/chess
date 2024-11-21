@@ -84,9 +84,9 @@ public class ConnectionManager {
 
         // Send NOTIFICATION to all other connections in that game
         ServerMessage serverMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
-        String action = " as an observer.";
-        if (game.whiteUsername() != null && game.whiteUsername().equals(userName)) { action = " as player White."; }
-        if (game.blackUsername() != null && game.blackUsername().equals(userName)) { action = " as player Black."; }
+        String action = "as an observer.";
+        if (game.whiteUsername() != null && game.whiteUsername().equals(userName)) { action = "as player White."; }
+        if (game.blackUsername() != null && game.blackUsername().equals(userName)) { action = "as player Black."; }
         serverMessage.setMessage(String.format("%s joined the game %s", userName, action));
         this.connections.computeIfAbsent(gameId, key -> new ArrayList<Connection>());
 

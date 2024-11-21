@@ -68,6 +68,7 @@ public class BoardBuilder {
         ArrayList<int[]> hSquares = new ArrayList<int[]>();
         if (pos != null) {
             hSquares = getHighlights(game, pos);
+            hSquares.add(new int[]{pos.getRow(), pos.getColumn()});
         }
 
         StringBuilder whiteBoard = new StringBuilder();

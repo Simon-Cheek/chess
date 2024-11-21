@@ -17,6 +17,7 @@ import websocket.WebSocketFacade;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.Scanner;
 
 public class Client {
 
@@ -57,22 +58,25 @@ public class Client {
     }
     public String postGameStatus() {
 
+        String whitePlayer = this.currentGame.whiteUsername();
+        String blackPlayer = this.currentGame.blackUsername();
+
         String result = "\n";
         if (this.currentGame.game().isFinished()) {
             ChessGame.TeamColor color = this.currentGame.game().getWinningColor();
             if (color.equals(ChessGame.TeamColor.WHITE)) {
-                result += ("White wins!\n");
+                result += String.format("Checkmate, %s (white) wins!\n", whitePlayer);
             } else if (color.equals(ChessGame.TeamColor.BLACK)) {
-                result += ("Black wins!\n");
+                result += String.format("Checkmate, %s (black) wins!\n", blackPlayer);
             } else {
-                result += ("Stalemate!\n");
+                result += ("Stalemate! No one wins :(\n");
             }
         } else {
             if (this.currentGame.game().isInCheck(ChessGame.TeamColor.WHITE)) {
-                result += ("White is in Check!\n");
+                result += String.format("%s (white) is in Check!\n", whitePlayer);
             }
             if (this.currentGame.game().isInCheck(ChessGame.TeamColor.BLACK)) {
-                result += ("Black is in Check!\n");
+                result += String.format("%s (black) is in Check!\n", blackPlayer);
             }
             if (this.currentGame.game().getTeamTurn() == ChessGame.TeamColor.WHITE) {
                 result += ("It is White's turn!\n");
@@ -102,8 +106,16 @@ public class Client {
     public String resignGame() {
         if (this.username.isEmpty()) { throw new RuntimeException("Not logged in"); }
         if (this.currentGame == null) { throw new RuntimeException("Not in a game"); }
-        this.webSocketFacade.resignGame(this.authToken, this.currentGame.gameID());
-        return "Successfully resigned";
+
+        System.out.print("Type 'yes' to confirm resign: ");
+        Scanner scanner = new Scanner(System.in);
+        String line = scanner.nextLine();
+        if (line.equals("yes")) {
+            this.webSocketFacade.resignGame(this.authToken, this.currentGame.gameID());
+            return "Resigning...";
+        } else {
+            return "Not resigning!";
+        }
     }
 
     public String makeMove(String[] params) {
@@ -127,7 +139,7 @@ public class Client {
         }
         ChessMove move = MoveGenerator.getMove(params[1], params[2], piece);
         this.webSocketFacade.makeMove(this.authToken, this.currentGame.gameID(), move);
-        return "Successfully made move";
+        return "Making move...";
     }
 
     public String leaveGame() {
@@ -135,7 +147,7 @@ public class Client {
         if (this.currentGame == null) { throw new RuntimeException("Not in a game"); }
         this.webSocketFacade.leaveGame(this.authToken, this.currentGame.gameID());
         this.currentGame = null;
-        return "Successfully left the game.";
+        return "Leaving the game...";
     }
 
     public String redrawGame() {
@@ -152,13 +164,16 @@ public class Client {
         if (params.length != 1) { throw new RuntimeException("Invalid Argument Length"); }
         ClientGameInfo gameInfo = this.getGameInfo(params[0]);
         String statement = String.format("Observing Game %d) %s\n", gameInfo.gameNumber(), gameInfo.gameName());
-        ChessGame game = this.games.get(gameInfo.gameNumber() - 1).game();
-        return statement + BoardBuilder.buildWhiteBoard(game, null) + BoardBuilder.buildBlackBoard(game, null);
+        GameRecord game = this.games.get(gameInfo.gameNumber() - 1);
+        this.webSocketFacade.connectToGame(this.authToken, game.gameID());
+        return statement;
     }
 
 
     public String joinGame(String[] params) {
         if (params.length != 2) { throw new RuntimeException("Invalid Argument Length"); }
+
+        if (this.currentGame != null) { throw new RuntimeException("Please leave your current game!"); }
 
         ClientGameInfo gameInfo = this.getGameInfo(params[0]);
 
