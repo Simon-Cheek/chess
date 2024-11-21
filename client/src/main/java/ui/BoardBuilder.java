@@ -17,6 +17,7 @@ public class BoardBuilder {
         ArrayList<int[]> hSquares = new ArrayList<int[]>();
         if (pos != null) {
             Collection<ChessMove> validMoves = game.validMoves(pos);
+            if (validMoves.isEmpty()) { return hSquares; }
             for (ChessMove move : validMoves) {
                 ChessPosition end = move.getEndPosition();
                 hSquares.add(new int[]{end.getRow(), end.getColumn()});
@@ -39,11 +40,12 @@ public class BoardBuilder {
         ArrayList<int[]> hSquares = new ArrayList<int[]>();
         if (pos != null) {
             hSquares = getHighlights(game, pos);
+            hSquares.add(new int[]{pos.getRow(), pos.getColumn()});
         }
 
         StringBuilder blackBoard = new StringBuilder();
         blackBoard.append("Chess Board: Black Perspective\n");
-        blackBoard.append(text).append("    a    b    c    d    e    f    g    h\n").append(reset);
+        blackBoard.append(text).append("    h    g    f    e    d    c    b    a\n").append(reset);
         for (int row = 1; row <= 8; row++) {
             blackBoard.append(text).append(row).append(reset).append(" ");
             for (int col = 8; col >= 1; col--) {
@@ -56,7 +58,7 @@ public class BoardBuilder {
             blackBoard.append(reset).append(EscapeSequences.RESET_BG_COLOR)
                     .append(" ").append(text).append(row).append(reset).append("\n");
         }
-        blackBoard.append(text).append("    a    b    c    d    e    f    g    h\n").append(reset);
+        blackBoard.append(text).append("    h    g    f    e    d    c    b    a\n").append(reset);
 
         return blackBoard.toString();
     }
@@ -70,7 +72,7 @@ public class BoardBuilder {
 
         StringBuilder whiteBoard = new StringBuilder();
         whiteBoard.append("Chess Board: White Perspective\n");
-        whiteBoard.append(text).append("    h    g    f    e    d    c    b    a\n").append(reset);
+        whiteBoard.append(text).append("    a    b    c    d    e    f    g    h\n").append(reset);
         for (int row = 8; row >= 1; row--) {
             whiteBoard.append(text).append(row).append(reset).append(" ");
             for (int col = 1; col <= 8; col++) {
@@ -83,7 +85,7 @@ public class BoardBuilder {
             whiteBoard.append(reset).append(EscapeSequences.RESET_BG_COLOR)
                     .append(" ").append(text).append(row).append(reset).append("\n");
         }
-        whiteBoard.append(text).append("    h    g    f    e    d    c    b    a\n\n").append(reset);
+        whiteBoard.append(text).append("    a    b    c    d    e    f    g    h\n").append(reset);
 
         return whiteBoard.toString();
     }
